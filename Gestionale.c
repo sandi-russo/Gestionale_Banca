@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include "Consumer.c"
+#include "Administrator.c"
 
-int main(){
-    printf("Ciao mondo!");
-
-    return 0;
+void main()
+{
+    printf("\nBenvenuto nella nostra banca!");
+    
 }
