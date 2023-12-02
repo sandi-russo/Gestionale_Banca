@@ -7,8 +7,10 @@
 void main()
 {
     // Apertura del file in modalità lettura
-    FILE *fpt = fopen("Utenti.csv", "r");
-
+    char p1[100] = "Utenti.csv"; //p1 sta per primo percorso file quindi in questo caso stiamo prendendo Utenti.csv
+    FILE *fpt;
+    controlloFileX(fpt, p1); //Funzione che controlla se il file esiste. Guardare CFileScrittura.C!
+    
     int scelta;
     printf("\nBenvenuto nella nostra banca!\n");
     printf("Cosa vuole fare?\n");
@@ -18,11 +20,11 @@ void main()
     switch (scelta)
     {
     case 1:
-        Login(fpt);
+        Login(fpt, p1);
         break;
 
     case 2:
-        Register(fpt);
+        Register(fpt, p1);
         break;
     }
 }

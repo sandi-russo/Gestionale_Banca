@@ -3,11 +3,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <Windows.h>
+#include "RWCFile.c"
 
 // Dichiarazione variabili per il form di Login e di Registrazione
 char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100];
 
-void Login(FILE *Utenti)
+void Login(FILE *Utenti, char percorso[100])
 {
     // Inserimento dati utente già registrato
     // Il system("cls") permette il clear della console su WINDOWS! E non su linux o su altri sistemi operativi. Se si vuole fare per altri sistemi si utilizza system("clear");
@@ -22,9 +23,9 @@ void Login(FILE *Utenti)
     printf("\nNu:%s, Pass:%s", NomeUtente, Password); // Debug per vedere se stampa i dati corretti
 }
 
-void Register(FILE *Utenti)
+void Register(FILE *Utenti, char percorso[100])
 {
-    Utenti = fopen("Utenti.csv", "w");
+    controlloFileX(Utenti, percorso); //Funzione che controlla se il file esiste. Guardare CFileScrittura.C!
 
     bool fineRegistrazione = false;
 
@@ -37,7 +38,6 @@ void Register(FILE *Utenti)
     scanf("%s", &Cognome);
     printf("Inserisci il tuo nome utente: ");
     scanf("%s", &NomeUtente);
-
     /*
     Questo do while permette di controllare se la password e la conferma_password combaciano,
     quindi se entrambe combaciano, manda alla finestra di login.
@@ -60,10 +60,12 @@ void Register(FILE *Utenti)
         {
             fineRegistrazione = true;
             printf("Le password combaciano, stai per entrare nella sezione per il login!");
+            cFileS5(Utenti, Nome, Cognome, NomeUtente, Password, ConfermaPassword, percorso);
             Sleep(2000);
-            Login(Utenti);
+            Login(Utenti, percorso);
         }
     } while (fineRegistrazione != true);
+
     // int provaPassword = strcmp(Password, ConfermaPassword);
     // printf("\nNome: %s; Cognome: %s; Nome utente: %s; Password: %s; Conferma: %s", Nome, Cognome, NomeUtente, Password, ConfermaPassword);
 }
