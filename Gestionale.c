@@ -9,7 +9,7 @@ void main()
     // Apertura del file in modalità lettura
     char p1[100] = "Utenti.csv"; //p1 sta per primo percorso file quindi in questo caso stiamo prendendo Utenti.csv
     FILE *fpt;
-    controlloFileX(fpt, p1); //Funzione che controlla se il file esiste. Guardare CFileScrittura.C!
+    controlloFileX(fpt, p1); //Funzione che controlla se il file esiste. Guardare RWCFile.C!
     
     int scelta;
     printf("\nBenvenuto nella nostra banca!\n");

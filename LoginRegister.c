@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <Windows.h>
 #include "RWCFile.c"
@@ -25,19 +24,23 @@ void Login(FILE *Utenti, char percorso[100])
 
 void Register(FILE *Utenti, char percorso[100])
 {
-    controlloFileX(Utenti, percorso); //Funzione che controlla se il file esiste. Guardare CFileScrittura.C!
+    controlloFileX(Utenti, percorso); //Funzione che controlla se il file esiste. Guardare RWCFile.C!
 
     bool fineRegistrazione = false;
+    bool controlloFineFile;
 
-    // Iserimento dati utente per registrazione
+    // Inserimento dati utente per registrazione
     system("cls");
     printf("Compila il seguente form per aprire il conto!\n");
     printf("Inserisci il tuo nome: ");
     scanf("%s", &Nome);
     printf("Inserisci il tuo cognome: ");
     scanf("%s", &Cognome);
-    printf("Inserisci il tuo nome utente: ");
-    scanf("%s", &NomeUtente);
+    do{
+        printf("Inserisci il tuo nome utente: ");
+        scanf("%s", &NomeUtente);
+        controlloFineFile = rFile(Utenti, percorso, NomeUtente, "Nome utente gia' esistente!\n");
+    }while(controlloFineFile != false);
     /*
     Questo do while permette di controllare se la password e la conferma_password combaciano,
     quindi se entrambe combaciano, manda alla finestra di login.
