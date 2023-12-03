@@ -39,7 +39,7 @@ void Register(FILE *Utenti, char percorso[100])
     do{
         printf("Inserisci il tuo nome utente: ");
         scanf("%s", &NomeUtente);
-        controlloFineFile = rFile(Utenti, percorso, NomeUtente, "Nome utente gia' esistente!\n");
+        controlloFineFile = rFile(Utenti, percorso, NomeUtente, "Nome utente gia' esistente!\n", 2);
     }while(controlloFineFile != false);
     /*
     Questo do while permette di controllare se la password e la conferma_password combaciano,

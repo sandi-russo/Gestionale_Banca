@@ -58,7 +58,7 @@ void cFileS5(FILE *f, char a[100], char b[100], char c[100], char d[100], char e
     fclose(f);
 }
 
-bool rFile(FILE *f, char percorso[100], char d[100], char *Titolo){ // Il parametro char d serve per ottenere le informazioni che devono essere controllate nel file
+bool rFile(FILE *f, char percorso[100], char d[100], char *Titolo, int c){ // Il parametro char d serve per ottenere le informazioni che devono essere controllate nel file
     char a[1000], *t, *g;
     int colonne = 0, righe = 0, comparazioneStringhe, cDiversi = 0, cUguali = 0;
     bool r;
@@ -70,7 +70,7 @@ bool rFile(FILE *f, char percorso[100], char d[100], char *Titolo){ // Il parame
 
             t = strtok(a, ",");
             while(t){
-                if(colonne == 2){
+                if(colonne == c){ // C sta per colonna
                     g = t; // Il token della terza colonna viene assegnato ad una variabile di appoggio
                     comparazioneStringhe = strcmp(g, d); // Compara il token con la stringa in entrata
                     if(comparazioneStringhe) // Se vero
