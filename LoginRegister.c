@@ -24,7 +24,7 @@ void Login(FILE *Utenti, char percorso[100])
 
 void Register(FILE *Utenti, char percorso[100])
 {
-    controlloFileX(Utenti, percorso); //Funzione che controlla se il file esiste. Guardare RWCFile.C!
+    controlloFileX(Utenti, percorso); // Funzione che controlla se il file esiste. Guardare RWCFile.C!
 
     bool fineRegistrazione = false;
     bool controlloFineFile;
@@ -36,11 +36,18 @@ void Register(FILE *Utenti, char percorso[100])
     scanf("%s", &Nome);
     printf("Inserisci il tuo cognome: ");
     scanf("%s", &Cognome);
-    do{
+
+    do
+    {
         printf("Inserisci il tuo nome utente: ");
         scanf("%s", &NomeUtente);
+
+        for (int i = 0; NomeUtente[i]; i++)
+        {
+            NomeUtente[i] = tolower(NomeUtente[i]);
+        }
         controlloFineFile = rFile(Utenti, percorso, NomeUtente, "Nome utente gia' esistente!\n", 2);
-    }while(controlloFineFile != false);
+    } while (controlloFineFile != false);
     /*
     Questo do while permette di controllare se la password e la conferma_password combaciano,
     quindi se entrambe combaciano, manda alla finestra di login.
@@ -54,7 +61,6 @@ void Register(FILE *Utenti, char percorso[100])
         int provaPassword = strcmp(Password, ConfermaPassword);
         if (provaPassword)
         {
-
             printf("Le password non combaciano, reinseriscile!\n");
             Sleep(2000);
             system("cls");
