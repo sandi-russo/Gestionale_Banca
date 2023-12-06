@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <Windows.h>
 #include "RWCFile.c"
 #include "IBAN.c"
 
@@ -11,7 +10,7 @@ char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[1
 void Login(FILE *Utenti, char percorso[100])
 {
     // Inserimento dati utente già registrato
-    // Il system("cls") permette il clear della console su WINDOWS! E non su linux o su altri sistemi operativi. Se si vuole fare per altri sistemi si utilizza system("clear");
+    // Il system("cls") permette il clear della console su WINDOWS ma non in altri sistemi operativi. Se si vuole fare per altri sistemi si utilizza system("clear");
     system("cls");
     printf("Benvenuto nella schermata di login!\n");
     printf("Inserisci i tuoi dati per accedere.\n");
@@ -29,7 +28,9 @@ void Register(FILE *Utenti, char percorso[100])
 
     bool fineRegistrazione = false;
     bool controlloFineFile;
-
+    char IBAN[28];
+    GeneraIBAN(IBAN);
+    
     // Inserimento dati utente per registrazione
     system("cls");
     printf("Compila il seguente form per aprire il conto!\n");
@@ -50,6 +51,7 @@ void Register(FILE *Utenti, char percorso[100])
         }
         controlloFineFile = rFile(Utenti, percorso, NomeUtente, "Nome utente gia' esistente!\n", 2);
     } while (controlloFineFile != false);
+
     /*
     Questo do while permette di controllare se la password e la conferma_password combaciano,
     quindi se entrambe combaciano, manda alla finestra di login.
@@ -71,7 +73,7 @@ void Register(FILE *Utenti, char percorso[100])
         {
             fineRegistrazione = true;
             printf("Le password combaciano, stai per entrare nella sezione per il login!");
-            cFileS5(Utenti, Nome, Cognome, NomeUtente, Password, ConfermaPassword, percorso);
+            cFileS5(Utenti, Nome, Cognome, NomeUtente, Password, IBAN, percorso);
             Sleep(2000);
             Login(Utenti, percorso);
         }

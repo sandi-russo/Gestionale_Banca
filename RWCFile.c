@@ -43,12 +43,11 @@ void cFileS3(FILE *f, char a[100], char b[100], char c[100], char percorso[100])
 void cFileS4(FILE *f, char a[100], char b[100], char c[100], char d[100], char percorso[100]) // Scrive nel file 4 array di caratteri solo nel caso il file csv contenga quattro colonne;
 {
     f = fopen(percorso, "a");
-    fprintf(f, "%s,%s,", a, b);
-    fprintf(f, "%s,%s\n", c, d);
+    fprintf(f, "%s,%s,%s,%s\n", a, b, c, d);
     fclose(f);
 }
 
-void cFileS5(FILE *f, char a[100], char b[100], char c[100], char d[100], char e[100], char percorso[100]) // Scrive nel file 5 array di caratteri solo nel caso il file csv contenga cinque colonne;
+void cFileS5(FILE *f, char a[], char b[], char c[], char d[], char e[], char percorso[100]) // Scrive nel file 5 array di caratteri solo nel caso il file csv contenga cinque colonne;
 {
     //printf("Nome:%s\n Cognome:%s\n NomeUtente:%s\n Password:%s\n ConfermaPassword:%s", a, b, c, d, e);//Riga di debug
     f = fopen(percorso, "a");
@@ -58,7 +57,7 @@ void cFileS5(FILE *f, char a[100], char b[100], char c[100], char d[100], char e
     fclose(f);
 }
 
-bool rFile(FILE *f, char percorso[100], char d[100], char *Titolo, int c){ // Il parametro char d serve per ottenere le informazioni che devono essere controllate nel file
+bool rFile(FILE *f, char percorso[100], char d[], char *Titolo, int c){ // Il parametro char d serve per ottenere le informazioni che devono essere controllate nel file
     char a[1000], *t, *g;
     int colonne = 0, righe = 0, comparazioneStringhe, cDiversi = 0, cUguali = 0;
     bool r;
