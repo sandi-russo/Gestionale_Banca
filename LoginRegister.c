@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 #include "RWCFile.c"
+#include "IBAN.c"
 
 // Dichiarazione variabili per il form di Login e di Registrazione
 char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100];
@@ -42,6 +43,7 @@ void Register(FILE *Utenti, char percorso[100])
         printf("Inserisci il tuo nome utente: ");
         scanf("%s", &NomeUtente);
 
+        // Ciclo per portare in corsivo il nome utente
         for (int i = 0; NomeUtente[i]; i++)
         {
             NomeUtente[i] = tolower(NomeUtente[i]);

@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "Consumer.c"
 #include "Administrator.c"
 #include "LoginRegister.c"
 
 void main()
 {
+
+    srand((unsigned int)time(NULL));
     // Apertura del file in modalità lettura
     char p1[100] = "Utenti.csv"; //p1 sta per primo percorso file quindi in questo caso stiamo prendendo Utenti.csv
     FILE *fpt;
