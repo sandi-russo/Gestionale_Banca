@@ -7,6 +7,7 @@
 // Dichiarazione variabili per il form di Login e di Registrazione
 char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100];
 
+
 void Login(FILE *Utenti, char percorso[100])
 {
     // Inserimento dati utente già registrato
@@ -81,4 +82,48 @@ void Register(FILE *Utenti, char percorso[100])
 
     // int provaPassword = strcmp(Password, ConfermaPassword);
     // printf("\nNome: %s; Cognome: %s; Nome utente: %s; Password: %s; Conferma: %s", Nome, Cognome, NomeUtente, Password, ConfermaPassword);
+}
+
+
+void Banca(){
+    srand((unsigned int)time(NULL));
+    int scelta;
+    // Apertura del file in modalità lettura
+    char p1[100] = "Utenti.csv"; // p1 sta per primo percorso file. In questo caso, stiamo prendendo "Utenti.csv"
+    FILE *fpt;
+    controlloFileX(fpt, p1); // Funzione che controlla se il file esiste. Guardare RWCFile.C!
+
+    do
+    {
+        printf("\nBenvenuto nella nostra banca!\n");
+        printf("Cosa vuole fare?\n");
+        printf("0 - Esci dal programma\n");
+        printf("1 - Entrare nel conto\n");
+        printf("2 - Aprire un conto\n");
+        scanf("%d", &scelta);
+
+        // Menu del programma
+        if (scelta == 1)
+        {
+            Login(fpt, p1);
+        }
+        else if (scelta == 2)
+        {
+            Register(fpt, p1);
+        }
+        else
+        {
+            if (scelta == 0)
+            {
+                printf("Uscita in corso dal programma!");
+            }
+            else
+            {
+                printf("Valore non valido!");
+                Sleep(2000);
+                system("cls");
+            }
+        }
+    } while (scelta != 0);
+
 }
