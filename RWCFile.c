@@ -80,3 +80,4 @@ void Writing(const char *nome, const char *cognome, const char *nomeUtente, cons
 
     printf("Registrazione completata con successo!\n");
 }
+

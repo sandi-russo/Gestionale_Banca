@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void Consumer()
+void Consumer(char *utenteAutenticato)
 {
-    printf("\nCiao Consumer!");
+    printf("\nCiao, %s!\n", utenteAutenticato);
 }

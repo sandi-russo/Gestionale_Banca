@@ -65,8 +65,6 @@ void Register()
         {
             FineRegistrazione = 1;
             Writing(Nome, Cognome, NomeUtente, Password, IBAN);
-            Sleep(2000);
-            Login();
         }
     } while (FineRegistrazione != 1);
 }
@@ -74,11 +72,12 @@ void Register()
 void Banca()
 {
     int scelta;
+    char utenteAutenticato[MAX_BUFFER];
 
     do
     {
         printf("\nBenvenuto nella nostra banca!\n");
-        printf("Cosa vuole fare?\n");
+        printf("Quale operazione desidera eseguire:\n");
         printf("0 - Esci dal programma\n");
         printf("1 - Entrare nel conto\n");
         printf("2 - Aprire un conto\n");
@@ -87,7 +86,8 @@ void Banca()
         // Menu del programma
         if (scelta == 1)
         {
-            Login();
+            Login(utenteAutenticato); // Richiamo la funzione Login dal file Login
+            Consumer(utenteAutenticato); // Richiamo la funzione Consumer dal file Consumer
         }
         else if (scelta == 2)
         {

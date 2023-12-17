@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <windows.h>
 
 #define NUM_COLONNE 5
 #define LunghezzaStringa 100
@@ -16,7 +17,7 @@ typedef struct
     char IBAN[LunghezzaStringa];
 } utente;
 
-int Login()
+int Login(char *utenteAutenticato)
 {
     FILE *fp;
     char row[maxchar];
@@ -92,6 +93,7 @@ int Login()
             {
                 printf("I dati combaciano.\n");
                 combacia = 1;
+                strcpy(utenteAutenticato, u[j].NomeUtente); // Memorizza il nome utente autenticato
                 break;
             }
         }
