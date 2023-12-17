@@ -5,20 +5,15 @@
 #include "IBAN.c"
 #include "Login.c"
 
-
 // Dichiarazione variabili per il form di Login e di Registrazione
-char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100];
+char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100], IBAN[28];
 
-
-void Register(FILE *Utenti, char percorso[100])
+void Register()
 {
-    controlloFileX(Utenti, percorso); // Funzione che controlla se il file esiste. Guardare RWCFile.C!
+    IsExists();       // Richiamo la funzione dal file RWCFile per controllare se esiste il file CSV
+    GeneraIBAN(IBAN); // Richiamo la funzione dal file IBAN per generare un IBAN
 
-    bool fineRegistrazione = false;
-    bool controlloFineFile;
-    char IBAN[28];
-    GeneraIBAN(IBAN);
-
+    int FineRegistrazione = 0, controlloUtente = 0, Virgola = 0;
     // Inserimento dati utente per registrazione
     system("cls");
     printf("Compila il seguente form per aprire il conto!\n");
@@ -29,21 +24,30 @@ void Register(FILE *Utenti, char percorso[100])
 
     do
     {
-        printf("Inserisci il tuo nome utente: ");
-        scanf("%s", &NomeUtente);
+        Virgola = 0; // Inizializza la variabile a false
 
-        // Ciclo per portare in corsivo il nome utente
+        printf("Inserisci il tuo nome utente: ");
+        scanf("%s", NomeUtente);
+
+        // Verifica se il nome utente contiene una virgola
         for (int i = 0; NomeUtente[i]; i++)
         {
+            if (NomeUtente[i] == ',')
+            {
+                Virgola = 1;
+                break;
+            }
             NomeUtente[i] = tolower(NomeUtente[i]);
         }
-        controlloFineFile = rFile(Utenti, percorso, NomeUtente, "Nome utente gia' esistente!\n", 2);
-    } while (controlloFineFile != false);
 
-    /*
-    Questo do while permette di controllare se la password e la conferma_password combaciano,
-    quindi se entrambe combaciano, manda alla finestra di login.
-    */
+        // Se il nome utente contiene una virgola, richiede di reinserire il valore
+        if (Virgola)
+        {
+            printf("Il nome utente non puo' contenere la virgola. Reinserisci il valore.\n");
+        }
+
+    } while (Virgola || UserExists(NomeUtente) != 0);
+
     do
     {
         printf("Inserisci una password: ");
@@ -59,25 +63,17 @@ void Register(FILE *Utenti, char percorso[100])
         }
         else
         {
-            fineRegistrazione = true;
-            printf("Le password combaciano, stai per entrare nella sezione per il login!");
-            cFileS5(Utenti, Nome, Cognome, NomeUtente, Password, IBAN, percorso);
+            FineRegistrazione = 1;
+            Writing(Nome, Cognome, NomeUtente, Password, IBAN);
             Sleep(2000);
-            Login(Utenti, percorso);
+            Login();
         }
-    } while (fineRegistrazione != true);
-
-    // int provaPassword = strcmp(Password, ConfermaPassword);
-    // printf("\nNome: %s; Cognome: %s; Nome utente: %s; Password: %s; Conferma: %s", Nome, Cognome, NomeUtente, Password, ConfermaPassword);
+    } while (FineRegistrazione != 1);
 }
 
 void Banca()
 {
     int scelta;
-    // Apertura del file in modalità lettura
-    char p1[100] = "Utenti.csv"; // p1 sta per primo percorso file. In questo caso, stiamo prendendo "Utenti.csv"
-    FILE *fpt;
-    controlloFileX(fpt, p1); // Funzione che controlla se il file esiste. Guardare RWCFile.C!
 
     do
     {
@@ -95,7 +91,7 @@ void Banca()
         }
         else if (scelta == 2)
         {
-            Register(fpt, p1);
+            Register();
         }
         else
         {

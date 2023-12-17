@@ -5,7 +5,6 @@
 
 void GeneraIBAN(char stringa[])
 {
-
     int min = 10, max = 99;
 
     int cineu = rand() % (max - min + 1) + min;
@@ -23,5 +22,4 @@ void GeneraIBAN(char stringa[])
     conto[7] = '\0';
 
     snprintf(stringa, 28, "%s%02d%c%s%s%s%s", it, cineu, cin, abi, cab, zeri, conto);
-
 }

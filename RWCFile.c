@@ -1,66 +1,82 @@
+// RWCFile è un alias che sta per Read And Write File Control
+
 #include <stdio.h>
-#include <Windows.h>
-#include <stdBool.h>
 #include <string.h>
-//RWCFile è un alias che sta per Read And Write File Control
+#define MAX_BUFFER 100
+const char *filename = "Utenti.csv";
 
-
-void controlloFileX(FILE *f , char percorso[100]) // Controlla se il file è stato trovato o meno;
+void IsExists()
 {
-    if(f == NULL)
+
+    FILE *file = fopen(filename, "r");
+
+    if (file == NULL) // Controllo se non esiste il file
     {
-        printf("Il file non esiste o non e' stato aperto.\n");
-        f = fopen(percorso, "w+"); // Se il file non esiste crea un file con il nome del percorso.
-        exit(1);
-    }else
-    {
-        printf("Il file e' stato aperto con successo!"); // Il file esiste ed è stato aperto;
-    }
-}
+        file = fopen(filename, "w"); // Creo il file e lo apro in scrittura
 
-void cFileS5(FILE *f, char a[], char b[], char c[], char d[], char e[], char percorso[100]) // Scrive nel file 5 array di caratteri solo nel caso il file csv contenga cinque colonne;
-{
-    //printf("Nome:%s\n Cognome:%s\n NomeUtente:%s\n Password:%s\n ConfermaPassword:%s", a, b, c, d, e);//Riga di debug
-    f = fopen(percorso, "a");
-    fprintf(f, "%s,%s,", a, b);
-    fprintf(f, "%s,%s,", c, d);
-    fprintf(f, "%s\n", e);
-    fclose(f);
-}
-
-bool rFile(FILE *f, char percorso[100], char d[], char *Titolo, int c){ // Il parametro char d serve per ottenere le informazioni che devono essere controllate nel file
-    char a[1000], *t, *g;
-    int colonne = 0, righe = 0, comparazioneStringhe, cDiversi = 0, cUguali = 0;
-    bool r;
-
-    f = fopen(percorso, "r"); // Apre il file in modalità lettura; 
-        while(fgets(a, sizeof(a), f) != NULL){//Cicla per tutto il file
-            righe++; // Inizia alla prima riga
-            colonne = 0; // Rinizializza la colonna a zero dopo che finisce di comparare la terza colonna
-
-            t = strtok(a, ",");
-            while(t){
-                if(colonne == c){ // C sta per colonna
-                    g = t; // Il token della terza colonna viene assegnato ad una variabile di appoggio
-                    comparazioneStringhe = strcmp(g, d); // Compara il token con la stringa in entrata
-                    if(comparazioneStringhe) // Se vero
-                    {
-                        cDiversi++; // I nomi sono diversi
-                    }else // Altrimenti
-                    {
-                        cUguali++; // I nomi sono uguali
-                    }
-                }
-                t = strtok(NULL, ",");
-                colonne++;
-            }
+        if (file != NULL)
+        {
+            fprintf(file, "Nome,Cognome,NomeUtente,Password,IBAN\n"); // Scrivo l'header
+            fclose(file);                                             // Chiudo il file dopo la scrittura
+            printf("Il file '%s' e' stato creato con successo.\n", filename);
         }
-    fclose(f); // Chiude il file
-    if(cUguali > 0){
-        r = true; // Ci sono token uguali;
-        printf("%s", Titolo); // Stampa quello che si vuole come messaggio di errore
-    }else{
-        r = false; // Non ci sono token uguali;
+        else
+        {
+            printf("Errore nella creazione del file.\n");
+        }
     }
-    return r;
+    else
+    {
+        fclose(file);
+        printf("Esiste il file '%s' e non lo creo.\n", filename);
+    }
+}
+
+int UserExists(const char *inputUtente)
+{
+    FILE *file = fopen(filename, "r");
+    char buffer[MAX_BUFFER];
+
+    if (file == NULL)
+    {
+        printf("Errore nell'apertura del file '%s'.\n", filename);
+        return 0; // Indica un errore nell'apertura del file
+    }
+
+    // Salta la prima riga contenente l'header
+    fgets(buffer, MAX_BUFFER, file);
+
+    // Scansione del file per controllare se il nome utente esiste già
+    while (fgets(buffer, MAX_BUFFER, file) != NULL)
+    {
+        char storedNomeUtente[100];
+        sscanf(buffer, "%*[^,],%*[^,],%[^,]", storedNomeUtente);
+
+        if (strcmp(inputUtente, storedNomeUtente) == 0)
+        {
+            fclose(file);
+            printf("Nome utente gia' esistente!\n");
+            return 1; // Indica che il nome utente esiste già nel file
+        }
+    }
+
+    fclose(file);
+    return 0; // Indica che il nome utente non esiste nel file
+}
+
+void Writing(const char *nome, const char *cognome, const char *nomeUtente, const char *password, const char *iban)
+{
+    FILE *file = fopen(filename, "a"); // Apre il file in modalità append
+
+    if (file == NULL)
+    {
+        printf("Errore nell'apertura del file '%s' per la scrittura.\n", filename);
+        return;
+    }
+
+    fprintf(file, "%s,%s,%s,%s,%s\n", nome, cognome, nomeUtente, password, iban);
+
+    fclose(file);
+
+    printf("Registrazione completata con successo!\n");
 }
