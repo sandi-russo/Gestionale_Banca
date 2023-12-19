@@ -17,56 +17,48 @@ void Register()
     // Inserimento dati utente per registrazione
     system("cls");
     printf("Compila il seguente form per aprire il conto!\n");
-    printf("Inserisci il tuo nome: ");
-    scanf("%s", &Nome);
-    printf("Inserisci il tuo cognome: ");
-    scanf("%s", &Cognome);
 
     do
     {
         Virgola = 0; // Inizializza la variabile a false
-
+        printf("Inserisci il tuo nome: ");
+        scanf("%s", &Nome);
+        printf("Inserisci il tuo cognome: ");
+        scanf("%s", &Cognome);
         printf("Inserisci il tuo nome utente: ");
         scanf("%s", NomeUtente);
+        printf("Inserisci una password: ");
+        scanf("%s", &Password);
+        printf("Conferma la password: ");
+        scanf("%s", &ConfermaPassword);
+        int provaPassword = 0;
+        provaPassword = strcmp(Password, ConfermaPassword);
 
         // Verifica se il nome utente contiene una virgola
         for (int i = 0; NomeUtente[i]; i++)
         {
-            if (NomeUtente[i] == ',')
+            if (NomeUtente[i] == ',' || Nome[i] == ',' || Cognome[i] == ',' || Password[i] == ',' || ConfermaPassword[i] == ',')
             {
                 Virgola = 1;
                 break;
             }
             NomeUtente[i] = tolower(NomeUtente[i]);
         }
-
+        if (provaPassword < 0)
+        {
+            printf("\nLe password non sono uguali.");
+        }
         // Se il nome utente contiene una virgola, richiede di reinserire il valore
         if (Virgola)
         {
-            printf("Il nome utente non puo' contenere la virgola. Reinserisci il valore.\n");
+            printf("\nNon puoi inserire le virgole nel form. Reinserisci il valore.\n");
         }
-
-    } while (Virgola || UserExists(NomeUtente) != 0);
-
-    do
-    {
-        printf("Inserisci una password: ");
-        scanf("%s", &Password);
-        printf("Conferma la password: ");
-        scanf("%s", &ConfermaPassword);
-        int provaPassword = strcmp(Password, ConfermaPassword);
-        if (provaPassword)
-        {
-            printf("Le password non combaciano, reinseriscile!\n");
-            Sleep(2000);
-            system("cls");
-        }
-        else
+        if (Virgola == 0 && provaPassword == 0)
         {
             FineRegistrazione = 1;
-            Writing(Nome, Cognome, NomeUtente, Password, IBAN);
         }
-    } while (FineRegistrazione != 1);
+    } while (Virgola || UserExists(NomeUtente) != 0 || FineRegistrazione != 1);
+    Writing(Nome, Cognome, NomeUtente, Password, IBAN);
 }
 
 void Banca()
@@ -86,7 +78,7 @@ void Banca()
         // Menu del programma
         if (scelta == 1)
         {
-            Login(utenteAutenticato); // Richiamo la funzione Login dal file Login
+            Login(utenteAutenticato);    // Richiamo la funzione Login dal file Login
             Consumer(utenteAutenticato); // Richiamo la funzione Consumer dal file Consumer
         }
         else if (scelta == 2)

@@ -64,7 +64,7 @@ int UserExists(const char *inputUtente)
     return 0; // Indica che il nome utente non esiste nel file
 }
 
-void Writing(const char *nome, const char *cognome, const char *nomeUtente, const char *password, const char *iban)
+void Writing(char *nome, char *cognome, char *nomeUtente, char *password, char *iban)
 {
     FILE *file = fopen(filename, "a"); // Apre il file in modalità append
 
@@ -74,10 +74,9 @@ void Writing(const char *nome, const char *cognome, const char *nomeUtente, cons
         return;
     }
 
-    fprintf(file, "%s,%s,%s,%s,%s\n", nome, cognome, nomeUtente, password, iban);
+    fprintf(file, "%s,%s,%s,%s,%s\n", nome, cognome, nomeUtente, password, iban);   
 
     fclose(file);
 
     printf("Registrazione completata con successo!\n");
 }
-
