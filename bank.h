@@ -8,7 +8,6 @@
 #define LunghezzaStringa 100
 #define NumeroUtenti 255
 
-
 typedef struct
 {
     char Nome[LunghezzaStringa];
@@ -39,14 +38,12 @@ void GeneraIBAN(char stringa[])
     snprintf(stringa, 28, "%s%02d%c%s%s%s%s", it, cineu, cin, abi, cab, zeri, conto);
 }
 
-
 static const int maxchar = 100;
 
 void Consumer(char *utenteAutenticato)
 {
     printf("\nCiao, %s!\n", utenteAutenticato);
 }
-
 
 int Login(char *utenteAutenticato)
 {
@@ -81,24 +78,6 @@ int Login(char *utenteAutenticato)
     }
 
     fclose(fp);
-
-    // if (i > 0) return 0;
-    //  {
-    //      // Stampa le informazioni degli utenti
-    //      for (int j = 1; j < i; j++)
-    //      {
-    //          printf("\n--------------------\n");
-    //          printf("Nome: %s\n", u[j].Nome);
-    //          printf("Cognome: %s\n", u[j].Cognome);
-    //          printf("Nome Utente: %s\n", u[j].NomeUtente);
-    //          printf("Password: %s\n", u[j].Password);
-    //          printf("IBAN: %s\n", u[j].IBAN);
-    //      }
-    //  }
-    // else return 1;
-    //  {
-    //      printf("Nessun utente trovato nel file.\n");
-    //  }
 
     char nomeutente[100], password[100];
     int combacia = 0, tentativi = 0;
@@ -224,22 +203,20 @@ void Writing(char *nome, char *cognome, char *nomeUtente, char *password, char *
         return;
     }
 
-    fprintf(file, "%s,%s,%s,%s,%s\n", nome, cognome, nomeUtente, password, iban);   
+    fprintf(file, "%s,%s,%s,%s,%s\n", nome, cognome, nomeUtente, password, iban);
 
     fclose(file);
 
     printf("Registrazione completata con successo!\n");
 }
 
-
-
 // Dichiarazione variabili per il form di Login e di Registrazione
 char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100], IBAN[28];
 
 void Register()
 {
-    IsExists();       // Richiamo la funzione dal file RWCFile per controllare se esiste il file CSV
-    GeneraIBAN(IBAN); // Richiamo la funzione dal file IBAN per generare un IBAN
+    IsExists();       // Richiamo la funzione per controllare se esiste il file CSV
+    GeneraIBAN(IBAN); // Richiamo la funzione per generare un IBAN
 
     int FineRegistrazione = 0, controlloUtente = 0, Virgola = 0;
     // Inserimento dati utente per registrazione
@@ -306,8 +283,7 @@ void Banca()
         // Menu del programma
         if (scelta == 1)
         {
-            Login(utenteAutenticato);    // Richiamo la funzione Login dal file Login
-
+            Login(utenteAutenticato); // Richiamo la funzione Login
         }
         else if (scelta == 2)
         {
@@ -328,3 +304,38 @@ void Banca()
         }
     } while (scelta != 0);
 }
+
+// void FileUpdate(char token[100], int l)
+// { // Il parametro char d serve per ottenere le informazioni che devono essere controllate nel file
+//     char buffer[1000], *delimeter, *gAppoggio;
+//     int colonne = 0, comparazioneStringhe;
+//     FILE *temp;
+
+//     f = fopen("Utenti.csv", "r"); // Apre il file in modalità lettura
+
+//     temp = fopen("Temp.csv", "w"); // Apro il file temporaneo
+
+//     while (fgets(buffer, sizeof(buffer), f) != NULL)
+//     {                // Cicla per tutto il file
+//         colonne = 0; // Rinizializza la colonna a zero dopo che finisce di comparare la terza colonna
+
+//         delimeter = strtok(buffer, ",");
+//         while (delimeter)
+//         {
+//             if (colonne == l)
+//             {
+//                 gAppoggio = delimeter;                           // Il token della terza colonna viene assegnato ad una variabile di appoggio
+//                 comparazioneStringhe = strcmp(token, gAppoggio); // Compara il token con la stringa in entrata
+//                 if (comparazioneStringhe)                        // Se vero
+//                 {
+//                     // Diversi
+//                     fputs(buffer, temp);
+//                 }
+//             }
+//             delimeter = strtok(NULL, ",");
+//             colonne++;
+//         }
+//     }
+//     fclose(f);     // Chiude il file
+//     fclose(temp); // Chiude il file temporaneo
+// }
