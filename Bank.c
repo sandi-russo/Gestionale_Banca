@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include "Consumer.c"
-#include "Administrator.c"
-#include "Register.c"
+#include "bank.h"
 
 int main()
 {
