@@ -23,3 +23,5 @@ void GeneraIBAN(char stringa[])
 
     snprintf(stringa, 28, "%s%02d%c%s%s%s%s", it, cineu, cin, abi, cab, zeri, conto);
 }
+
+// Ciao Danil
