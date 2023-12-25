@@ -2,152 +2,152 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include <Windows.h>
+#include <windows.h>
 
 #define NUM_COLONNE 5
-#define LunghezzaStringa 100
-#define NumeroUtenti 255
+#define MAX_STR_LEN 100
+#define MAX_UTENTI 255
+#define FILE_NAME "Utenti.csv"
+#define TEMP_FILE_NAME "Temp.csv"
 
-typedef struct
+// Dichiarazione variabili per il form di Login e di Registrazione
+char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100], IBAN[28];
+
+typedef struct // Sruttura contenente i dati del singolo utente
 {
-    char Nome[LunghezzaStringa];
-    char Cognome[LunghezzaStringa];
-    char NomeUtente[LunghezzaStringa];
-    char Password[LunghezzaStringa];
-    char IBAN[LunghezzaStringa];
+    char NomeUtente[MAX_STR_LEN];
+    char Password[MAX_STR_LEN];
+    char IBAN[MAX_STR_LEN];
+    float Saldo;
+    char Nome[MAX_STR_LEN];
+    char Cognome[MAX_STR_LEN];
 } utente;
 
 void GeneraIBAN(char stringa[])
 {
     int min = 10, max = 99;
 
-    int cineu = rand() % (max - min + 1) + min;
-    char it[] = "IT";
-    char abi[] = "07648";
-    char cab[] = "05433";
-    char zeri[] = "00000";
-    char conto[8];
-    char cin = 'A' + rand() % 26;
+    // Dichiarazione dei parametri che compongono un IBAN generico
+    char it[] = "IT";                           // Sigla nazionale
+    int cineu = rand() % (max - min + 1) + min; // Codice di controllo europeo
+    char cin = 'A' + rand() % 26;               // Codice di controllo interno
+    char abi[] = "07648";                       // Codice identificativo banca
+    char cab[] = "05433";                       // Codice identificativo filiale
+    char zeri[] = "00000";                      // Zeri identificaativi numero conto
+    char conto[8];                              // Numero conto
 
+    // Generazione casuale del numero conto
     for (int i = 0; i < 7; i++)
     {
         conto[i] = '0' + rand() % (10);
     }
     conto[7] = '\0';
 
+    // Unione dei singoli elementi In un'unica stringa IBAN
     snprintf(stringa, 28, "%s%02d%c%s%s%s%s", it, cineu, cin, abi, cab, zeri, conto);
 }
-
-static const int maxchar = 100;
 
 void Consumer(char *utenteAutenticato)
 {
     printf("\nCiao, %s!\n", utenteAutenticato);
 }
 
-int Login(char *utenteAutenticato)
+void Login(char *utenteAutenticato)
 {
-    FILE *fp;
-    char row[maxchar];
-    int i = 0;
+    FILE *file;
+    char InputNomeUtente[MAX_STR_LEN], InputPassword[MAX_STR_LEN], riga[MAX_STR_LEN];
+    int Trovato, tentativi = 5, daticorretti = 0;
 
-    fp = fopen("Utenti.csv", "r"); // Apro il file csv in lettura
+    system("cls");
 
-    utente u[NumeroUtenti]; // Dichiarazione di un array di strutture utente
-
-    while (fgets(row, maxchar, fp) != NULL)
+    while (!daticorretti && tentativi > 0)
     {
+        // Stampa menu login
+        printf("Benvenuti nella schermata di Login!\n");
+        printf("\nInserisci il tuo nome utente: ");
+        scanf("%s", InputNomeUtente);
+        printf("Inserisci la tua password: ");
+        scanf("%s", InputPassword);
 
-        if (i == 0)
-        { // Salto la prima riga "header"
-            i++;
-            continue;
+        file = fopen(FILE_NAME, "r");
+
+        if (file == NULL)
+        {
+            printf("Errore nella lettura del file %s", FILE_NAME);
+            fclose(file);
+            exit(EXIT_FAILURE);
         }
 
-        printf("%d riga: %s", i, row);
+        Trovato = 0;
 
-        // Utilizza sscanf per assegnare i valori ai campi della struttura
-        sscanf(row, "%[^,],%[^,],%[^,],%[^,],%[^\n]",
-               u[i].Nome,
-               u[i].Cognome,
-               u[i].NomeUtente,
-               u[i].Password,
-               u[i].IBAN);
-
-        i++;
-    }
-
-    fclose(fp);
-
-    char nomeutente[100], password[100];
-    int combacia = 0, tentativi = 0;
-
-    // Inserimento dati utente già registrato
-    // Il system("cls") permette il clear della console su WINDOWS ma non in altri sistemi operativi. Se si vuole fare per altri sistemi si utilizza system("clear");
-    system("cls");
-    printf("Benvenuto nella schermata di login!\n");
-
-    do
-    {
-        printf("Inserisci i tuoi dati per accedere.\n");
-        printf("Nome Utente: ");
-        scanf("%s", &nomeutente);
-        printf("Password: ");
-        scanf("%s", &password);
-
-        combacia = 0;
-
-        for (int j = 1; j < i; j++)
+        while (fgets(riga, MAX_STR_LEN, file) != NULL)
         {
-            if ((strcmp(nomeutente, u[j].NomeUtente) == 0) && (strcmp(password, u[j].Password) == 0))
+            char StoredNomeUtente[MAX_STR_LEN];
+            sscanf(riga, "%[^;]", StoredNomeUtente);
+
+            if (strcmp(InputNomeUtente, StoredNomeUtente) == 0)
             {
-                printf("I dati combaciano.\n");
-                combacia = 1;
-                strcpy(utenteAutenticato, u[j].NomeUtente); // Memorizza il nome utente autenticato
-                Consumer(utenteAutenticato);
-                break;
+                Trovato = 1;
+
+                utente user;
+                sscanf(riga, "%[^;];%[^;];%[^;];%f;%[^;];%[^;];",
+                       user.NomeUtente, user.Password, user.IBAN,
+                       &user.Saldo, user.Nome, user.Cognome);
+
+                if (strcmp(InputPassword, user.Password) == 0)
+                {
+                    daticorretti = 1;
+                    printf("Utente [%s] autenticato\n", user.NomeUtente);
+                    strcpy(utenteAutenticato, user.NomeUtente);
+                    break; // Esci dal ciclo quando l'utente è autenticato
+                }
+                else
+                {
+                    tentativi--;
+                    printf("Password errata.");
+                }
             }
         }
 
-        if (combacia == 0)
-        {
-            tentativi++;
+        fclose(file);
 
-            if (tentativi < 5)
+        if (!Trovato)
+        {
+            tentativi--;
+            printf("L'utente [%s] non risulta registrato.\n", InputNomeUtente);
+        }
+
+        if (!daticorretti)
+        {
+            // Stampa avviso di numero di tentativi disponibili superato
+            if (tentativi == 0)
             {
-                printf("\nI dati non combaciano. Riprova.\n");
-                Sleep(2000);
-                system("cls");
+                printf("Troppi tentativi errati. Uscita in corso...\n");
             }
             else
             {
-                printf("Mi dispiace ma hai sbagliato %d volte!", tentativi);
-                Sleep(2000);
-                system("cls");
-                break; // Esci dal ciclo se il numero di tentativi raggiunge 5
+                printf("Tentativi rimasti: %d", tentativi);
             }
         }
-
-    } while (combacia != 1 && tentativi != 5);
+        Sleep(2000);
+        system("cls");
+    }
 }
 
-#define MAX_BUFFER 100
-const char *filename = "Utenti.csv";
-
-void IsExists()
+void IsFileExists()
 {
 
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(FILE_NAME, "r"); // Apro il file in modalita' lettura
 
     if (file == NULL) // Controllo se non esiste il file
     {
-        file = fopen(filename, "w"); // Creo il file e lo apro in scrittura
+        file = fopen(FILE_NAME, "w"); // Creo il file e lo apro in scrittura
 
         if (file != NULL)
         {
-            fprintf(file, "Nome,Cognome,NomeUtente,Password,IBAN\n"); // Scrivo l'header
-            fclose(file);                                             // Chiudo il file dopo la scrittura
-            printf("Il file '%s' e' stato creato con successo.\n", filename);
+            fprintf(file, "NomeUtente;Password;IBAN;Saldo;Nome;Cognome;\n"); // Scrivo l'header
+            fclose(file);                                                    // Chiudo il file dopo la scrittura
+            // printf("Il file '%s' e' stato creato con successo.\n", FILE_NAME);
         }
         else
         {
@@ -157,35 +157,34 @@ void IsExists()
     else
     {
         fclose(file);
-        printf("Esiste il file '%s' e non lo creo.\n", filename);
+        // printf("Il file '%s' e' gia' esistente!\n", FILE_NAME);
     }
 }
 
-int UserExists(const char *inputUtente)
+int UserExists(const char *InputNomeUtente)
 {
-    FILE *file = fopen(filename, "r");
-    char buffer[MAX_BUFFER];
+    FILE *file = fopen(FILE_NAME, "r");
+    char buffer[MAX_STR_LEN];
 
     if (file == NULL)
     {
-        printf("Errore nell'apertura del file '%s'.\n", filename);
+        printf("Errore nell'apertura del file '%s'.\n", FILE_NAME);
         return 0; // Indica un errore nell'apertura del file
     }
 
     // Salta la prima riga contenente l'header
-    fgets(buffer, MAX_BUFFER, file);
+    fgets(buffer, MAX_STR_LEN, file);
 
-    // Scansione del file per controllare se il nome utente esiste già
-    while (fgets(buffer, MAX_BUFFER, file) != NULL)
+    // Scansione del file riga per riga
+    while (fgets(buffer, MAX_STR_LEN, file) != NULL)
     {
-        char storedNomeUtente[100];
-        sscanf(buffer, "%*[^,],%*[^,],%[^,]", storedNomeUtente);
+        char StoredNomeUtente[100];
+        sscanf(buffer, "%[^;]", StoredNomeUtente);
 
-        if (strcmp(inputUtente, storedNomeUtente) == 0)
+        if (strcmp(InputNomeUtente, StoredNomeUtente) == 0)
         {
-            fclose(file);
             printf("Nome utente gia' esistente!\n");
-            return 1; // Indica che il nome utente esiste già nel file
+            return 1; // Indica che il nome utente esiste nel file
         }
     }
 
@@ -193,39 +192,33 @@ int UserExists(const char *inputUtente)
     return 0; // Indica che il nome utente non esiste nel file
 }
 
-void Writing(char *nome, char *cognome, char *nomeUtente, char *password, char *iban)
+void Writing(char *nome, char *cognome, char *nomeUtente, char *password, char *iban, float saldo)
 {
-    FILE *file = fopen(filename, "a"); // Apre il file in modalità append
+    FILE *file = fopen(FILE_NAME, "a"); // Apri il file in modalità append
 
     if (file == NULL)
     {
-        printf("Errore nell'apertura del file '%s' per la scrittura.\n", filename);
+        printf("Errore nell'apertura del file '%s' per la scrittura.\n", FILE_NAME);
         return;
     }
 
-    fprintf(file, "%s,%s,%s,%s,%s\n", nome, cognome, nomeUtente, password, iban);
-
+    fprintf(file, "%s;%s;%s;%0.2f;%s;%s;\n", nomeUtente, password, iban, saldo, nome, cognome);
     fclose(file);
-
-    printf("Registrazione completata con successo!\n");
 }
-
-// Dichiarazione variabili per il form di Login e di Registrazione
-char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100], IBAN[28];
 
 void Register()
 {
-    IsExists();       // Richiamo la funzione per controllare se esiste il file CSV
+    IsFileExists();   // Richiamo la funzione per controllare se esiste il file CSV
     GeneraIBAN(IBAN); // Richiamo la funzione per generare un IBAN
-
-    int FineRegistrazione = 0, controlloUtente = 0, Virgola = 0;
+    float Saldo = 0.00;
+    int FineRegistrazione = 0, controlloUtente = 0, Delimiter, provaPassword;
     // Inserimento dati utente per registrazione
-    system("cls");
-    printf("Compila il seguente form per aprire il conto!\n");
 
     do
     {
-        Virgola = 0; // Inizializza la variabile a false
+        system("cls");
+        printf("Compila il seguente form per aprire il conto!\n");
+
         printf("Inserisci il tuo nome: ");
         scanf("%s", Nome);
         printf("Inserisci il tuo cognome: ");
@@ -236,106 +229,95 @@ void Register()
         scanf("%s", Password);
         printf("Conferma la password: ");
         scanf("%s", ConfermaPassword);
-        int provaPassword = 0;
+
         provaPassword = strcmp(Password, ConfermaPassword);
 
-        // Verifica se il nome utente contiene una virgola
+        // Inizializzo il flag Delimiter a fa
+        Delimiter = 0;
+
+        // Verifica se l'utentente inserisce un punto e virgola
         for (int i = 0; NomeUtente[i]; i++)
         {
-            if (NomeUtente[i] == ',' || Nome[i] == ',' || Cognome[i] == ',' || Password[i] == ',' || ConfermaPassword[i] == ',')
+            if (NomeUtente[i] == ';' || Nome[i] == ';' || Cognome[i] == ';' || Password[i] == ';' || ConfermaPassword[i] == ';')
             {
-                Virgola = 1;
+                Delimiter = 1;
                 break;
             }
             NomeUtente[i] = tolower(NomeUtente[i]);
         }
-        if (provaPassword < 0)
+        if (provaPassword != 0)
         {
-            printf("\nLe password non sono uguali.");
+            printf("\nLe password non sono uguali.\n");
         }
-        // Se il nome utente contiene una virgola, richiede di reinserire il valore
-        if (Virgola)
+        // Se i dati inseriti dall'utente contengono il delimiter, richiede di reinserire i dati
+        if (Delimiter)
         {
-            printf("\nNon puoi inserire le virgole nel form. Reinserisci il valore.\n");
+            printf("\nCarattere \";\" non valido. Riprova:\n");
         }
-        if (Virgola == 0 && provaPassword == 0)
+        if (Delimiter == 0 && provaPassword == 0)
         {
             FineRegistrazione = 1;
         }
-    } while (Virgola || UserExists(NomeUtente) != 0 || FineRegistrazione != 1);
-    Writing(Nome, Cognome, NomeUtente, Password, IBAN);
+
+    } while (Delimiter || UserExists(NomeUtente) != 0 || FineRegistrazione != 1);
+
+    Writing(Nome, Cognome, NomeUtente, Password, IBAN, Saldo);
+
+    printf("Registrazione avvenuta con successo! Reindirizzamento al menu in corso...");
+
+    Sleep(2000);
+    system("cls");
 }
 
 void Banca()
 {
     int scelta;
-    char utenteAutenticato[MAX_BUFFER];
+    char utenteAutenticato[MAX_STR_LEN];
 
     do
     {
-        printf("\nBenvenuto nella nostra banca!\n");
-        printf("Quale operazione desidera eseguire:\n");
+        system("cls");
+        printf("Benvenuto nella nostra banca!\n");
+        printf("\nMenu:\n");
         printf("0 - Esci dal programma\n");
         printf("1 - Entrare nel conto\n");
         printf("2 - Aprire un conto\n");
-        scanf("%d", &scelta);
+        printf("\nInserisci la tua scelta: ");
 
-        // Menu del programma
+        // Controlla se l'input è un numero intero
+        if (scanf("%d", &scelta) != 1)
+        {
+            // Pulisce l'input buffer
+            while (getchar() != '\n')
+                ;
+
+            printf("Input non valido. Inserisci un numero.\n");
+
+            Sleep(2000);
+            system("cls");
+
+            continue; // Rientra nel ciclo per ottenere un valore corretto
+        }
+
+        // Scelta dell'opzione
         if (scelta == 1)
         {
             Login(utenteAutenticato); // Richiamo la funzione Login
         }
         else if (scelta == 2)
         {
-            Register();
+            Register(); // Richiamo la funzione Register
+        }
+        else if (scelta == 0)
+        {
+            printf("Uscita dal programma in corso...\n");
         }
         else
         {
-            if (scelta == 0)
-            {
-                printf("Uscita in corso dal programma!");
-            }
-            else
-            {
-                printf("Valore non valido!");
-                Sleep(2000);
-                system("cls");
-            }
+            printf("Valore non inserito valido!\n"); // Gestisci input non validi
+
+            Sleep(2000);
+            system("cls");
         }
     } while (scelta != 0);
 }
-
-// void FileUpdate(char token[100], int l)
-// { // Il parametro char d serve per ottenere le informazioni che devono essere controllate nel file
-//     char buffer[1000], *delimeter, *gAppoggio;
-//     int colonne = 0, comparazioneStringhe;
-//     FILE *temp;
-
-//     f = fopen("Utenti.csv", "r"); // Apre il file in modalità lettura
-
-//     temp = fopen("Temp.csv", "w"); // Apro il file temporaneo
-
-//     while (fgets(buffer, sizeof(buffer), f) != NULL)
-//     {                // Cicla per tutto il file
-//         colonne = 0; // Rinizializza la colonna a zero dopo che finisce di comparare la terza colonna
-
-//         delimeter = strtok(buffer, ",");
-//         while (delimeter)
-//         {
-//             if (colonne == l)
-//             {
-//                 gAppoggio = delimeter;                           // Il token della terza colonna viene assegnato ad una variabile di appoggio
-//                 comparazioneStringhe = strcmp(token, gAppoggio); // Compara il token con la stringa in entrata
-//                 if (comparazioneStringhe)                        // Se vero
-//                 {
-//                     // Diversi
-//                     fputs(buffer, temp);
-//                 }
-//             }
-//             delimeter = strtok(NULL, ",");
-//             colonne++;
-//         }
-//     }
-//     fclose(f);     // Chiude il file
-//     fclose(temp); // Chiude il file temporaneo
-// }

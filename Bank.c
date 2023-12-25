@@ -2,7 +2,7 @@
 
 int main()
 {
-    srand((unsigned int)time(NULL)); // Generazione seed randomico per la generazione dell'Iban
-    Banca(); // Richiamo la funzione Banca dal file RWCFile
+    srand((unsigned int)time(NULL)); // Seed randomico per la generazione dell'IBANa
+    Banca(); // Richiamo la funzione Banca dalla libreria
     return 0;
 }
