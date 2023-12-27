@@ -6,6 +6,7 @@
 
 #define NUM_COLONNE 5
 #define MAX_STR_LEN 100
+#define MAX_BUFFER_LEN 1024
 #define MAX_UTENTI 255
 #define FILE_NAME "Utenti.csv"
 #define TEMP_FILE_NAME "Temp.csv"
@@ -47,6 +48,114 @@ void GeneraIBAN(char stringa[])
     snprintf(stringa, 28, "%s%02d%c%s%s%s%s", it, cineu, cin, abi, cab, zeri, conto);
 }
 
+int SearchInFile(FILE *File, char *Colonna, char *Valore, char *RigaVuota)
+{   
+    rewind(File);
+    char RigaTemp[MAX_STR_LEN];
+    char Riga[MAX_STR_LEN];
+    char *Token;
+    int indice_colonna = -1, UserExists = 0, ColumnExists = 0;
+    // Leggi il file e cerca la colonna specificata
+    if (fgets(Riga, MAX_BUFFER_LEN, File) != NULL)
+    {
+        strcpy(RigaTemp, Riga); // Copia la riga per non perdere dati con strtok
+        Token = strtok(RigaTemp, ";");
+        for (int i = 0; Token; i++)
+        {
+            if (strcmp(Token, Colonna) == 0)
+            {
+                indice_colonna = i;
+                ColumnExists = 1;
+                break;
+            }
+            Token = strtok(NULL, ";");
+        }
+    }
+    if (!ColumnExists)
+    {
+        return -1; // La colonna specificata non esiste nel file
+    }
+    // Leggi il file e cerca la riga contenente il valore specificato
+    while (fgets(Riga, MAX_BUFFER_LEN, File) != NULL)
+    {
+        strcpy(RigaTemp, Riga); // Copia la riga per non perdere dati con strtok
+        Token = strtok(RigaTemp, ";");
+        for (int i = 0; Token; i++)
+        {
+            if (i == indice_colonna && strcmp(Token, Valore) == 0)
+            {   
+                // Copia nella stringa vuota la riga contenente i dati dell'utente
+                strcpy(RigaVuota, Riga);
+                return 0; // L'elemento è stato trovato
+            }
+            Token = strtok(NULL, ";");
+        }
+    }
+    return 1; // L'elemento non esiste nel file
+}
+
+utente CreateUserStruct(char *RigaUtente)
+{   
+    utente user;
+    sscanf(RigaUtente, "%[^;];%[^;];%[^;];%f;%[^;];%[^;];",
+        user.NomeUtente, user.Password, user.IBAN,
+        &user.Saldo, user.Nome, user.Cognome);
+
+    return user;
+}
+
+void FileUpdate(char *colonna, char *valore)
+{
+    FILE *File, *FileTemp;
+    char riga[MAX_STR_LEN];
+    char RigaUtente[MAX_STR_LEN];
+
+    // Apertura dei file nella modalità adatta
+    File = fopen(FILE_NAME, "r");
+    FileTemp = fopen(TEMP_FILE_NAME, "w");
+
+    // Verifica che i file siano stati aperti correttamente
+    if (!File || !FileTemp)
+    {
+        printf("Errore nell'apertura dei file.\n");
+        exit(EXIT_FAILURE);
+    }
+    // Cerca la riga contenente il valore specificato nella colonna specificata
+    if (SearchInFile(File, colonna, valore, RigaUtente) < 0)
+    {
+        printf("La colonna specificata non esiste nel file.\n");
+        fclose(File);
+        fclose(FileTemp);
+        exit(EXIT_FAILURE);
+    }
+    else if (SearchInFile(File, colonna, valore, RigaUtente) > 0)
+    {
+        printf("L'elemento specificato non esiste nella colonna indicata.\n");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {   
+        rewind(File);
+        while (fgets(riga, MAX_BUFFER_LEN, File) != NULL)
+        {
+            if (strcmp(riga, RigaUtente) != 0)
+            {
+                fprintf(FileTemp, "%s", riga);
+            }
+        }
+    }
+
+    // Chiusura dei file
+    fclose(File);
+    fclose(FileTemp);
+
+    // Rimuovi il file "Utenti.csv" obsoleto
+    remove(FILE_NAME);
+
+    // Rinomina il file temporaneo aggiornato in "Utenti.csv"
+    rename(TEMP_FILE_NAME, FILE_NAME);
+}
+
 void Consumer(char *utenteAutenticato)
 {
     printf("\nCiao, %s!\n", utenteAutenticato);
@@ -54,8 +163,16 @@ void Consumer(char *utenteAutenticato)
 
 void Login(char *utenteAutenticato)
 {
-    FILE *file;
-    char InputNomeUtente[MAX_STR_LEN], InputPassword[MAX_STR_LEN], riga[MAX_STR_LEN];
+    FILE *file = fopen(FILE_NAME, "r");
+
+    if (file == NULL)
+        {
+            printf("Errore nella lettura del file %s", FILE_NAME);
+            fclose(file);
+            exit(EXIT_FAILURE);
+        }
+
+    char InputNomeUtente[MAX_STR_LEN], InputPassword[MAX_STR_LEN], RigaUtente[MAX_STR_LEN];
     int Trovato, tentativi = 5, daticorretti = 0;
 
     system("cls");
@@ -69,53 +186,28 @@ void Login(char *utenteAutenticato)
         printf("Inserisci la tua password: ");
         scanf("%s", InputPassword);
 
-        file = fopen(FILE_NAME, "r");
-
-        if (file == NULL)
+         // Cerca la riga contenente il valore specificato nella colonna specificata
+        if (SearchInFile(file, "NomeUtente", InputNomeUtente, RigaUtente) > 0)
         {
-            printf("Errore nella lettura del file %s", FILE_NAME);
-            fclose(file);
-            exit(EXIT_FAILURE);
+            printf("Username errato. Riprova.\n");
+            tentativi--;
         }
-
-        Trovato = 0;
-
-        while (fgets(riga, MAX_STR_LEN, file) != NULL)
+        else
         {
-            char StoredNomeUtente[MAX_STR_LEN];
-            sscanf(riga, "%[^;]", StoredNomeUtente);
+            utente user = CreateUserStruct(RigaUtente);
 
-            if (strcmp(InputNomeUtente, StoredNomeUtente) == 0)
+            if (strcmp(user.Password, InputPassword) == 0)
             {
-                Trovato = 1;
-
-                utente user;
-                sscanf(riga, "%[^;];%[^;];%[^;];%f;%[^;];%[^;];",
-                       user.NomeUtente, user.Password, user.IBAN,
-                       &user.Saldo, user.Nome, user.Cognome);
-
-                if (strcmp(InputPassword, user.Password) == 0)
-                {
-                    daticorretti = 1;
-                    printf("Utente [%s] autenticato\n", user.NomeUtente);
-                    strcpy(utenteAutenticato, user.NomeUtente);
-                    break; // Esci dal ciclo quando l'utente è autenticato
-                }
-                else
-                {
-                    tentativi--;
-                    printf("Password errata.");
-                }
+                daticorretti = 1;
+                printf("Utente [%s] autenticato con successo\n", user.NomeUtente);
+            }
+            else
+            {
+                printf("Password errata. Riprova.\n");
+                tentativi--;
             }
         }
 
-        fclose(file);
-
-        if (!Trovato)
-        {
-            tentativi--;
-            printf("L'utente [%s] non risulta registrato.\n", InputNomeUtente);
-        }
 
         if (!daticorretti)
         {
