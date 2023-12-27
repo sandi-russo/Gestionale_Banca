@@ -49,7 +49,7 @@ void GeneraIBAN(char stringa[])
 }
 
 int SearchInFile(FILE *File, char *Colonna, char *Valore, char *RigaVuota)
-{   
+{
     rewind(File);
     char RigaTemp[MAX_STR_LEN];
     char Riga[MAX_STR_LEN];
@@ -83,7 +83,7 @@ int SearchInFile(FILE *File, char *Colonna, char *Valore, char *RigaVuota)
         for (int i = 0; Token; i++)
         {
             if (i == indice_colonna && strcmp(Token, Valore) == 0)
-            {   
+            {
                 // Copia nella stringa vuota la riga contenente i dati dell'utente
                 strcpy(RigaVuota, Riga);
                 return 0; // L'elemento è stato trovato
@@ -95,11 +95,11 @@ int SearchInFile(FILE *File, char *Colonna, char *Valore, char *RigaVuota)
 }
 
 utente CreateUserStruct(char *RigaUtente)
-{   
+{
     utente user;
     sscanf(RigaUtente, "%[^;];%[^;];%[^;];%f;%[^;];%[^;];",
-        user.NomeUtente, user.Password, user.IBAN,
-        &user.Saldo, user.Nome, user.Cognome);
+           user.NomeUtente, user.Password, user.IBAN,
+           &user.Saldo, user.Nome, user.Cognome);
 
     return user;
 }
@@ -131,10 +131,12 @@ void FileUpdate(char *colonna, char *valore)
     else if (SearchInFile(File, colonna, valore, RigaUtente) > 0)
     {
         printf("L'elemento specificato non esiste nella colonna indicata.\n");
+        fclose(File);
+        fclose(FileTemp);
         exit(EXIT_FAILURE);
     }
     else
-    {   
+    {
         rewind(File);
         while (fgets(riga, MAX_BUFFER_LEN, File) != NULL)
         {
@@ -149,28 +151,120 @@ void FileUpdate(char *colonna, char *valore)
     fclose(File);
     fclose(FileTemp);
 
-    // Rimuovi il file "Utenti.csv" obsoleto
-    remove(FILE_NAME);
+    // Elimina il file Utenti.csv originale
+    if (remove("Utenti.csv") != 0)
+    {
+        perror("Errore nell'eliminazione di Utenti.csv originale");
+        exit(EXIT_FAILURE);
+    }
 
-    // Rinomina il file temporaneo aggiornato in "Utenti.csv"
-    rename(TEMP_FILE_NAME, FILE_NAME);
+    // Rinomina il file Temp.csv in Utenti.csv
+    if (rename("Temp.csv", "Utenti.csv") != 0)
+    {
+        perror("Errore nella rinomina di Temp.csv");
+        exit(EXIT_FAILURE);
+    }
 }
 
-void Consumer(char *utenteAutenticato)
+void Writing(char *nomeUtente, char *password, char *iban, float saldo, char *nome, char *cognome)
 {
-    printf("\nCiao, %s!\n", utenteAutenticato);
+    FILE *file = fopen(FILE_NAME, "a"); // Apri il file in modalità append
+
+    if (file == NULL)
+    {
+        printf("Errore nell'apertura del file '%s' per la scrittura.\n", FILE_NAME);
+        return;
+    }
+
+    fprintf(file, "%s;%s;%s;%0.2f;%s;%s;\n", nomeUtente, password, iban, saldo, nome, cognome);
+    fclose(file);
 }
 
-void Login(char *utenteAutenticato)
+void Transazione(utente *user, float importo)
+{
+    user->Saldo += importo;
+    FileUpdate("NomeUtente", user->NomeUtente);
+    Writing(user->NomeUtente, user->Password, user->IBAN, user->Saldo, user->Nome, user->Cognome);
+}
+
+void Consumer(utente user)
+{
+    int scelta;
+    float importo = 0;
+
+    do
+    {
+        Sleep(2000);
+        system("cls");
+        printf("Titolare del conto: %s %-10s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+        printf("\nMenu:\n");
+        printf("0 - Esci dal conto\n");
+        printf("1 - Versamento\n");
+        printf("2 - Prelievo\n");
+        printf("3 - Bonifico\n");
+        printf("\nInserisci la tua scelta: ");
+
+        // Controlla se l'input è un numero intero
+        if (scanf("%d", &scelta) != 1)
+        {
+            // Pulisce l'input buffer
+            while (getchar() != '\n')
+                ;
+
+            printf("Input non valido. Inserisci un numero.\n");
+
+            Sleep(2000);
+            system("cls");
+
+            continue; // Rientra nel ciclo per ottenere un valore corretto
+        }
+
+        // Scelta dell'opzione
+        if (scelta == 1)
+        {
+            printf("Iserisci l'importo da versare: ");
+            scanf("%f", &importo);
+            Transazione(&user, importo);
+            printf("Versamento effettuato.");
+        }
+        else if (scelta == 2)
+        {
+            printf("Iserisci l'importo da prelevare: ");
+            scanf("%f", &importo);
+            if (importo <= user.Saldo)
+            {
+                Transazione(&user, -importo);
+                printf("Versamento effettuato.");
+            }
+            else
+            {
+                printf("Saldo insufficiente");
+            }
+        }
+        else if (scelta == 0)
+        {
+            printf("Uscita dal conto in corso...\n");
+        }
+        else
+        {
+            printf("Valore non inserito valido!\n"); // Gestisci input non validi
+
+            Sleep(2000);
+            system("cls");
+        }
+    } while (scelta != 0);
+}
+
+void Login()
 {
     FILE *file = fopen(FILE_NAME, "r");
 
     if (file == NULL)
-        {
-            printf("Errore nella lettura del file %s", FILE_NAME);
-            fclose(file);
-            exit(EXIT_FAILURE);
-        }
+    {
+        printf("Errore nella lettura del file %s", FILE_NAME);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
 
     char InputNomeUtente[MAX_STR_LEN], InputPassword[MAX_STR_LEN], RigaUtente[MAX_STR_LEN];
     int Trovato, tentativi = 5, daticorretti = 0;
@@ -186,7 +280,7 @@ void Login(char *utenteAutenticato)
         printf("Inserisci la tua password: ");
         scanf("%s", InputPassword);
 
-         // Cerca la riga contenente il valore specificato nella colonna specificata
+        // Cerca la riga contenente il valore specificato nella colonna specificata
         if (SearchInFile(file, "NomeUtente", InputNomeUtente, RigaUtente) > 0)
         {
             printf("Username errato. Riprova.\n");
@@ -200,6 +294,7 @@ void Login(char *utenteAutenticato)
             {
                 daticorretti = 1;
                 printf("Utente [%s] autenticato con successo\n", user.NomeUtente);
+                Consumer(user);
             }
             else
             {
@@ -207,7 +302,6 @@ void Login(char *utenteAutenticato)
                 tentativi--;
             }
         }
-
 
         if (!daticorretti)
         {
@@ -284,20 +378,6 @@ int UserExists(const char *InputNomeUtente)
     return 0; // Indica che il nome utente non esiste nel file
 }
 
-void Writing(char *nome, char *cognome, char *nomeUtente, char *password, char *iban, float saldo)
-{
-    FILE *file = fopen(FILE_NAME, "a"); // Apri il file in modalità append
-
-    if (file == NULL)
-    {
-        printf("Errore nell'apertura del file '%s' per la scrittura.\n", FILE_NAME);
-        return;
-    }
-
-    fprintf(file, "%s;%s;%s;%0.2f;%s;%s;\n", nomeUtente, password, iban, saldo, nome, cognome);
-    fclose(file);
-}
-
 void Register()
 {
     IsFileExists();   // Richiamo la funzione per controllare se esiste il file CSV
@@ -308,6 +388,7 @@ void Register()
 
     do
     {
+        Sleep(2000);
         system("cls");
         printf("Compila il seguente form per aprire il conto!\n");
 
@@ -353,7 +434,7 @@ void Register()
 
     } while (Delimiter || UserExists(NomeUtente) != 0 || FineRegistrazione != 1);
 
-    Writing(Nome, Cognome, NomeUtente, Password, IBAN, Saldo);
+    Writing(NomeUtente, Password, IBAN, Saldo, Nome, Cognome);
 
     printf("Registrazione avvenuta con successo! Reindirizzamento al menu in corso...");
 
@@ -364,11 +445,10 @@ void Register()
 void Banca()
 {
     int scelta;
-    char utenteAutenticato[MAX_STR_LEN];
 
     do
     {
-        system("cls");
+        // system("cls");
         printf("Benvenuto nella nostra banca!\n");
         printf("\nMenu:\n");
         printf("0 - Esci dal programma\n");
@@ -394,7 +474,7 @@ void Banca()
         // Scelta dell'opzione
         if (scelta == 1)
         {
-            Login(utenteAutenticato); // Richiamo la funzione Login
+            Login(); // Richiamo la funzione Login
         }
         else if (scelta == 2)
         {
