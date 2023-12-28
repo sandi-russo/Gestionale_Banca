@@ -197,6 +197,14 @@ void Writing(char *NomeFile, const char *nomeUtente, const char *password, const
     ChiudiFile(file, "WriteFail: errore nella chiusura del file");
 }
 
+void WritingStruct(char *NomeFile, utente *user)
+{
+    FILE *file = ApriFile(NomeFile, "a", "WriteFail: errore nell'apertura del file");
+    fprintf(file, "%s;%s;%s;%0.2f;%s;%s;\n", user->NomeUtente, user->Password, user->IBAN, user->Saldo, user->Nome, user->Cognome);
+    ChiudiFile(file, "WriteFail: errore nella chiusura del file");
+}
+
+
 void Transazione(utente *user, float importo)
 {
     user->Saldo += importo;
@@ -204,7 +212,87 @@ void Transazione(utente *user, float importo)
     Writing(TEMP_FILE_NAME, user->NomeUtente, user->Password, user->IBAN, user->Saldo, user->Nome, user->Cognome);
 }
 
-void stampaListaUtentiEModifica(FILE *f){
+bool modificaUtente(utente *user){
+    int scelta;
+    float saldo;
+    bool fineLoop = false;
+    char nomeutente[MAX_STR_LEN], cognome[MAX_STR_LEN], nome[MAX_STR_LEN], password[MAX_STR_LEN];
+
+    do{
+        system("cls");
+        printf("----------------------------------------------------------------\n");
+        printf("Cosa vorresti modificare dell'utente: %s?\n", user->NomeUtente);
+        printf("1 - NomeUtente\n");
+        printf("2 - Password\n");
+        printf("3 - Saldo\n");
+        printf("4 - Nome\n");
+        printf("5 - Cognome\n\n");
+        printf("0 - Esci\n");
+        printf("----------------------------------------------------------------\n");
+        printf("Inserisci scelta: ");
+        scanf("%d", &scelta);
+        switch (scelta)
+        {
+        case 0:
+            printf("Uscita In corso...\n");
+            Sleep(500);
+            fineLoop = true;
+            return fineLoop;
+        break;
+            
+        case 1:
+            RemoveLine("NomeUtente", user->NomeUtente);
+            printf("Inserisci nuovo Nome Utente:");
+            scanf("%s", nomeutente);
+            strcpy(user->NomeUtente, nomeutente);
+            WritingStruct(TEMP_FILE_NAME, user);
+            printf("Modifica Eseguita con successo!\n");
+            Sleep(1000);
+        break;
+        case 2:
+            RemoveLine("NomeUtente", user->NomeUtente);
+            printf("Inserisci nuova Password:");
+            scanf("%s", password);
+            strcpy(user->Password, password);
+            WritingStruct(TEMP_FILE_NAME, user);
+            printf("Modifica Eseguita con successo!\n");
+            Sleep(1000);
+        break;
+        case 3:
+            printf("Inserisci l'importo:");
+            scanf("%f", &saldo);
+            Transazione(user, saldo);
+            printf("Modifica Eseguita con successo!\n");
+            Sleep(1000);
+        break;
+        case 4:
+            RemoveLine("NomeUtente", user->NomeUtente);
+            printf("Inserisci nuovo Nome:");
+            scanf("%s", nome);
+            strcpy(user->Nome, nome);
+            WritingStruct(TEMP_FILE_NAME, user);
+            printf("Modifica Eseguita con successo!\n");
+            Sleep(1000);            
+        break;
+        case 5:
+            RemoveLine("NomeUtente", user->NomeUtente);
+            printf("Inserisci nuova Cognome:");
+            scanf("%s", cognome);
+            strcpy(user->Cognome, cognome);
+            WritingStruct(TEMP_FILE_NAME, user);
+            printf("Modifica Eseguita con successo!\n");
+            Sleep(1000);
+        break;
+        default:
+            system("cls");
+            printf("InputFail: non puoi insere numeri diversi da quelli che sono scritti!\n");
+            Sleep(500);
+        break;
+        }
+    }while(fineLoop != true);
+}
+
+void stampaListaUtenti(FILE *f){
     char buffer[MAX_BUFFER_LEN], *tokens;
     int colonne = 0, posNC = 1;
  
@@ -233,43 +321,82 @@ void stampaListaUtentiEModifica(FILE *f){
     }
     printf("----------------------------------------------------------------\n");
     ChiudiFile(f, "Non e' stato possibile chiudere il file!");
-
     // Stampa Nomi e Cognomi
-    bool fineModifiche = false;
-    char nomeUtente[MAX_STR_LEN];
- 
-    do{
-        printf("Quale utente vorresti scegliere?\n");
-        printf("Inserisci nome utente:");
-        scanf("%s", nomeUtente);
-        
- 
- 
-    }while(fineModifiche != true);
- 
- 
 }
+
+
+void utentiModifiche(FILE *f){
+    bool fineModifiche = false;
+    bool fineModificheUtente;
+    char rigaUtente[MAX_STR_LEN];
+    char nomeUtente[MAX_STR_LEN];
+    int scelta; 
+
+    do{
+        printf("----------------------------------------------------------------\n");
+        printf("1 - Scegli Utente\n");
+        printf("0 - Esci\n");
+        printf("----------------------------------------------------------------\n");
+        printf("Inserisci scelta:");
+        scanf("%d", &scelta);
+        switch(scelta)
+        {
+            case 0:
+                printf("Uscita In corso...\n");
+                Sleep(500);
+                fineModifiche = true;
+                fineModificheUtente = true;
+            break;
+            case 1:
+                system("cls");
+                stampaListaUtenti(f);
+                printf("Inserisci nome utente:");
+                scanf("%s", nomeUtente);
+                if(SearchInFile("NomeUtente", nomeUtente, rigaUtente) == 0)
+                {
+                    utente user = CreateUserStruct(rigaUtente);
+                    fineModificheUtente = modificaUtente(&user);
+                }
+            break;
+
+            default:
+                system("cls");
+                printf("InputFail: non puoi insere numeri diversi da quelli che sono scritti!\n");
+                Sleep(500);
+            break;
+        }
+
  
+    }while(fineModifiche != true && !fineModifiche);
+}
+
 void Admin(){
     int scelta = 0;
-
-    system("cls");
-    printf("----------------------------------------------------------------\n");
-    printf("Benvenuto Admin!\nDa questo pannello potrai controllare l'intero sistema bancario!\n");
     FILE *utenti;
  
 
     do{
-        printf("Che cosa vorresti fare oggi?\n");
+        system("cls");
+        printf("----------------------------------------------------------------\n");
+        printf("Benvenuto Admin!\nDa questo pannello potrai controllare l'intero sistema bancario!\n");
+        printf("Che cosa vorresti fare oggi?\n\n");
+        printf("1 - Modifica Utenti\n");
         printf("0 - Esci\n");
-        printf("1 - Lista Utenti\n");
         printf("----------------------------------------------------------------\n");
         printf("Inserisci la tua scelta: ");
         scanf("%d", &scelta);
         switch(scelta){
+            case 0:
+                printf("Arrivederci!");
+            break;
             case 1:
                 system("cls");
-                stampaListaUtentiEModifica(utenti);
+                utentiModifiche(utenti);
+            break;
+            default:
+                system("cls");
+                printf("InputFail: non puoi insere numeri diversi da quelli che sono scritti!\n");
+                Sleep(500);
             break;
         }
  
