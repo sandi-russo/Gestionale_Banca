@@ -213,7 +213,7 @@ void Transazione(utente *user, float importo)
 }
 
 bool modificaUtente(utente *user){
-    int scelta;
+    int scelta, contatoreModifiche = 0;
     float saldo;
     bool fineLoop = false;
     char nomeutente[MAX_STR_LEN], cognome[MAX_STR_LEN], nome[MAX_STR_LEN], password[MAX_STR_LEN];
@@ -226,7 +226,8 @@ bool modificaUtente(utente *user){
         printf("2 - Password\n");
         printf("3 - Saldo\n");
         printf("4 - Nome\n");
-        printf("5 - Cognome\n\n");
+        printf("5 - Cognome\n");
+        printf("6 - Applica le modifiche\n\n");
         printf("0 - Esci\n");
         printf("----------------------------------------------------------------\n");
         printf("Inserisci scelta: ");
@@ -234,6 +235,7 @@ bool modificaUtente(utente *user){
         switch (scelta)
         {
         case 0:
+            if(contatoreModifiche > 0) FileUpdate(FILE_NAME, TEMP_FILE_NAME);
             printf("Uscita In corso...\n");
             Sleep(500);
             fineLoop = true;
@@ -241,47 +243,63 @@ bool modificaUtente(utente *user){
         break;
             
         case 1:
+            printf("Vecchio Nome Utente: %s\n", user->NomeUtente);
             RemoveLine("NomeUtente", user->NomeUtente);
             printf("Inserisci nuovo Nome Utente:");
             scanf("%s", nomeutente);
             strcpy(user->NomeUtente, nomeutente);
-            WritingStruct(TEMP_FILE_NAME, user);
             printf("Modifica Eseguita con successo!\n");
+            contatoreModifiche++;
             Sleep(1000);
         break;
         case 2:
-            RemoveLine("NomeUtente", user->NomeUtente);
+            printf("Vecchia Password: %s\n", user->Password);
+            RemoveLine("Password", user->Password);
             printf("Inserisci nuova Password:");
             scanf("%s", password);
             strcpy(user->Password, password);
-            WritingStruct(TEMP_FILE_NAME, user);
             printf("Modifica Eseguita con successo!\n");
+            contatoreModifiche++;
             Sleep(1000);
         break;
         case 3:
+            printf("Vecchio Saldo: %f\n", user->Saldo);
             printf("Inserisci l'importo:");
             scanf("%f", &saldo);
-            Transazione(user, saldo);
+            user->Saldo += saldo;
+            RemoveLine("IBAN", user->IBAN);
+            contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
             Sleep(1000);
         break;
         case 4:
-            RemoveLine("NomeUtente", user->NomeUtente);
+            printf("Vecchio Nome: %s\n", user->Nome);
+            RemoveLine("Nome", user->Nome);
             printf("Inserisci nuovo Nome:");
             scanf("%s", nome);
             strcpy(user->Nome, nome);
-            WritingStruct(TEMP_FILE_NAME, user);
+            contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
             Sleep(1000);            
         break;
         case 5:
-            RemoveLine("NomeUtente", user->NomeUtente);
+            printf("Vecchio Cognome: %s\n", user->Cognome);
+            RemoveLine("Cognome", user->Cognome);
             printf("Inserisci nuova Cognome:");
             scanf("%s", cognome);
             strcpy(user->Cognome, cognome);
-            WritingStruct(TEMP_FILE_NAME, user);
+            contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
             Sleep(1000);
+        break;
+        case 6:
+            if(contatoreModifiche > 0){
+                RemoveLine("IBAN", user->IBAN);
+                WritingStruct(TEMP_FILE_NAME, user);
+            }else{
+                printf("Non hai apportato modifiche all'utente selezionato.");
+                Sleep(700);
+            }
         break;
         default:
             system("cls");
@@ -333,6 +351,7 @@ void utentiModifiche(FILE *f){
     int scelta; 
 
     do{
+        system("cls");
         printf("----------------------------------------------------------------\n");
         printf("1 - Scegli Utente\n");
         printf("0 - Esci\n");
