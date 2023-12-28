@@ -133,7 +133,7 @@ utente CreateUserStruct(char *RigaUtente)
     return user;
 }
 
-void FileUpdate(const char *colonna, const char *valore)
+void RemoveLine(const char *colonna, const char *valore)
 {
     FILE *file = ApriFile(FILE_NAME, "r", "EditFail: errore nell'apertura del file originale");
     FILE *fileTemp = ApriFile(TEMP_FILE_NAME, "w", "EditFail: errore nell'apertura del file temporaneo");
@@ -167,29 +167,28 @@ void FileUpdate(const char *colonna, const char *valore)
             }
         }
     }
-
     // Chiusura dei file dopo l'uso
     ChiudiFile(file, "EditFail: errore nella chiusura del file originale");
     ChiudiFile(fileTemp, "EditFail: errore nella chiusura del file temporaneo");
+}
 
-    // Elimina il file Utenti.csv originale
-    if (remove(FILE_NAME) != 0)
-    {
-        perror("EditFail: errore nell'eliminazione di Utenti.csv originale");
+void FileUpdate(const char *OldFile, const char *NewFile) {
+    // Elimina l'old file
+    if (remove(OldFile) != 0) {
+        perror("UpdateFail: Errore durante l'eliminazione del file [Utenti.csv] obsoleto");
         exit(EXIT_FAILURE);
     }
 
-    // Rinomina il file Temp.csv in Utenti.csv
-    if (rename(TEMP_FILE_NAME, FILE_NAME) != 0)
-    {
-        perror("EditFail: errore nella rinomina di Temp.csv");
+    // Rinomina il new file con il nome dell'old file
+    if (rename(NewFile, OldFile) != 0) {
+        perror("UpdateFail: Errore durante la rinomina del file [Temp.csv] in [Utenti.csv]");
         exit(EXIT_FAILURE);
     }
 }
 
-void Writing(const char *nomeUtente, const char *password, const char *iban, float saldo, const char *nome, const char *cognome)
+void Writing(char *NomeFile, const char *nomeUtente, const char *password, const char *iban, float saldo, const char *nome, const char *cognome)
 {
-    FILE *file = ApriFile(FILE_NAME, "a", "WriteFail: errore nell'apertura del file");
+    FILE *file = ApriFile(NomeFile, "a", "WriteFail: errore nell'apertura del file");
 
     fprintf(file, "%s;%s;%s;%0.2f;%s;%s;\n", nomeUtente, password, iban, saldo, nome, cognome);
 
@@ -200,8 +199,8 @@ void Writing(const char *nomeUtente, const char *password, const char *iban, flo
 void Transazione(utente *user, float importo)
 {
     user->Saldo += importo;
-    FileUpdate("NomeUtente", user->NomeUtente);
-    // Writing(user->NomeUtente, user->Password, user->IBAN, user->Saldo, user->Nome, user->Cognome);
+    RemoveLine("NomeUtente", user->NomeUtente);
+    Writing(TEMP_FILE_NAME, user->NomeUtente, user->Password, user->IBAN, user->Saldo, user->Nome, user->Cognome);
 }
 
 void Consumer(utente user)
@@ -214,7 +213,7 @@ void Consumer(utente user)
         Sleep(2000);
         system("cls");
 
-        printf("Titolare del conto: %s %-10s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+        printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
         printf("----------------------------------------------------------------\n");
         printf("Menu:\n");
         printf("\n1 - Effettua un versamento\n");
@@ -246,7 +245,7 @@ void Consumer(utente user)
             printf("\nCaricamento in corso...\n");
             Sleep(2000);
             system("cls");
-            printf("Titolare del conto: %s %-10s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+            printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
             printf("----------------------------------------------------------------\n");
             printf("Iserisci l'importo da versare: ");
             scanf("%f", &importo);
@@ -258,7 +257,7 @@ void Consumer(utente user)
             printf("\nCaricamento in corso...\n");
             Sleep(2000);
             system("cls");
-            printf("Titolare del conto: %s %-10s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+            printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
             printf("----------------------------------------------------------------\n");
             printf("Iserisci l'importo da prelevare: ");
             scanf("%f", &importo);
@@ -280,7 +279,7 @@ void Consumer(utente user)
             {   
                 Sleep(2000);
                 system("cls");
-                printf("Titolare del conto: %s %-10s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+                printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
                 printf("----------------------------------------------------------------\n");
                 printf("Nome utente: %s\n", user.NomeUtente);
                 printf("IBAN: %s\n", user.IBAN);
@@ -351,7 +350,8 @@ void Login()
                 daticorretti = 1;
                 printf("\nUtente [ %s ] autenticato con successo\n\nIngresso nel conto...\n", user.NomeUtente);
                 Consumer(user);
-            }
+                FileUpdate(FILE_NAME, TEMP_FILE_NAME);
+            }   
             else
             {
                 printf("\nPassword errata. Riprova\n");
@@ -468,7 +468,7 @@ void Register()
         }
     } while (Delimiter || UserExists(NomeUtente) != 0 || FineRegistrazione != 1);
 
-    Writing(NomeUtente, Password, IBAN, Saldo, Nome, Cognome);
+    Writing(FILE_NAME, NomeUtente, Password, IBAN, Saldo, Nome, Cognome);
 
     printf("\nRegistrazione avvenuta con successo\n\nReindirizzamento al menu in corso...\n");
 }
