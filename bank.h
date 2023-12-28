@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include <windows.h>
 
@@ -203,6 +204,78 @@ void Transazione(utente *user, float importo)
     Writing(TEMP_FILE_NAME, user->NomeUtente, user->Password, user->IBAN, user->Saldo, user->Nome, user->Cognome);
 }
 
+void stampaListaUtentiEModifica(FILE *f){
+    char buffer[MAX_BUFFER_LEN], *tokens;
+    int colonne = 0, posNC = 1;
+ 
+    // Stampa Nomi e Cognomi
+    f = ApriFile(FILE_NAME, "r", "Non e' stato possibile aprire il file!");
+    fgets(buffer, sizeof(buffer), f);
+    printf("----------------------------------------------------------------\n");
+    printf("   Utente             Nome      Cognome\n\n");
+    while(fgets(buffer, sizeof(buffer), f) != NULL){
+        colonne = 0;
+ 
+        tokens = strtok(buffer, ";");
+        printf("%d) ", posNC);
+        printf("%-18s ", tokens);
+        while(tokens){
+            if(colonne == 4){
+                printf("%-9s ", tokens);
+            }
+            if(colonne == 5){
+                printf("%-10s\n", tokens);
+            }
+            tokens = strtok(NULL, ";");
+            colonne++;
+        }
+        posNC++;
+    }
+    printf("----------------------------------------------------------------\n");
+    ChiudiFile(f, "Non e' stato possibile chiudere il file!");
+
+    // Stampa Nomi e Cognomi
+    bool fineModifiche = false;
+    char nomeUtente[MAX_STR_LEN];
+ 
+    do{
+        printf("Quale utente vorresti scegliere?\n");
+        printf("Inserisci nome utente:");
+        scanf("%s", nomeUtente);
+        
+ 
+ 
+    }while(fineModifiche != true);
+ 
+ 
+}
+ 
+void Admin(){
+    int scelta = 0;
+
+    system("cls");
+    printf("----------------------------------------------------------------\n");
+    printf("Benvenuto Admin!\nDa questo pannello potrai controllare l'intero sistema bancario!\n");
+    FILE *utenti;
+ 
+
+    do{
+        printf("Che cosa vorresti fare oggi?\n");
+        printf("0 - Esci\n");
+        printf("1 - Lista Utenti\n");
+        printf("----------------------------------------------------------------\n");
+        printf("Inserisci la tua scelta: ");
+        scanf("%d", &scelta);
+        switch(scelta){
+            case 1:
+                system("cls");
+                stampaListaUtentiEModifica(utenti);
+            break;
+        }
+ 
+    }while(scelta != 0);
+}
+
 void Consumer(utente user)
 {
     int scelta;
@@ -217,7 +290,7 @@ void Consumer(utente user)
         printf("----------------------------------------------------------------\n");
         printf("Menu:\n");
         printf("\n1 - Effettua un versamento\n");
-        printf("2 - Evvettua un prelievo\n");
+        printf("2 - Effettua un prelievo\n");
         printf("3 - Effettua un bonifico\n");
         printf("4 - Visualizza le tue coordinate bancarie\n");
         printf("5 - Chiudi il tuo conto\n");
@@ -249,8 +322,12 @@ void Consumer(utente user)
             printf("----------------------------------------------------------------\n");
             printf("Iserisci l'importo da versare: ");
             scanf("%f", &importo);
-            Transazione(&user, importo);
-            printf("\nVersamento effettuato. L'importo versato sara' disponibile immediatamente\n");
+            if(importo < 0){
+                printf("Importo Errato!");
+            }else{
+                Transazione(&user, importo);
+                printf("\nVersamento effettuato. L'importo versato sara' disponibile immediatamente\n");
+            }
         }
         else if (scelta == 2)
         {   
@@ -348,6 +425,7 @@ void Login()
             if (strcmp(user.Password, InputPassword) == 0)
             { // Se la password e' corretta, entra nel conto
                 daticorretti = 1;
+                ChiudiFile(file, "LoginFail: il file non e' stato chiuso correttamente");
                 printf("\nUtente [ %s ] autenticato con successo\n\nIngresso nel conto...\n", user.NomeUtente);
                 Consumer(user);
                 FileUpdate(FILE_NAME, TEMP_FILE_NAME);
@@ -364,6 +442,7 @@ void Login()
             if (tentativi == 0)
             { // Stampa avviso di numero di tentativi disponibili superato
                 printf("\nTroppi tentativi errati\n\nUscita in corso...\n");
+                ChiudiFile(file, "LoginFail: il file non e' stato chiuso correttemente");
             }
         }
     }
