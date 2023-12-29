@@ -236,6 +236,7 @@ bool modificaUtente(utente *user){
         {
         case 0:
             if(contatoreModifiche > 0) FileUpdate(FILE_NAME, TEMP_FILE_NAME);
+            contatoreModifiche = 0;
             printf("Uscita In corso...\n");
             Sleep(500);
             fineLoop = true;
@@ -296,6 +297,7 @@ bool modificaUtente(utente *user){
             if(contatoreModifiche > 0){
                 RemoveLine("IBAN", user->IBAN);
                 WritingStruct(TEMP_FILE_NAME, user);
+                contatoreModifiche = 0;
             }else{
                 printf("Non hai apportato modifiche all'utente selezionato.");
                 Sleep(700);
