@@ -1,4 +1,4 @@
-#include "bank.h"
+#include "file.c"
 
 int main()
 {   
