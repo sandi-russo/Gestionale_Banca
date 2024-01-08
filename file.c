@@ -209,10 +209,9 @@ bool modificaUtente(utente *user)
         printf("2 - Password\n");
         printf("3 - Saldo\n");
         printf("4 - Nome\n");
-        printf("5 - Cognome\n");
-        printf("6 - Applica le modifiche\n\n");
+        printf("5 - Cognome\n\n");
         printf("----------------------------------------------------------------\n");
-        printf("0 - Esci\n");
+        printf("6 - Applica le modifiche | 0 - Esci\n");
         printf("----------------------------------------------------------------\n");
         printf("Seleziona un'opzione: ");
         scanf("%d", &scelta);
@@ -251,7 +250,7 @@ bool modificaUtente(utente *user)
             printf("Vecchio Saldo: %f\n", user->Saldo);
             printf("Inserisci l'importo: ");
             scanf("%f", &saldo);
-            user->Saldo += saldo;
+            user->Saldo = saldo;
             RemoveLine("IBAN", user->IBAN);
             contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
@@ -505,7 +504,7 @@ void Consumer(utente user)
                 printf("----------------------------------------------------------------\n");
                 printf("Nome utente: %s\n", user.NomeUtente);
                 printf("IBAN: %s\n", user.IBAN);
-                printf("Pasese: IT\n");
+                printf("Paese: IT\n");
                 printf("ABI: %s\n", ABI);
                 printf("CAB: %s\n", CAB);
                 printf("BIC/SWIFT: UNCODMMXXX\n\n");
