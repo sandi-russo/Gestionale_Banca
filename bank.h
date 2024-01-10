@@ -9,8 +9,8 @@
 #define MAX_STR_LEN 100           // Definizamo la lunghezza massima della stringa
 #define MAX_BUFFER_LEN 1024       // Definizamo la lunghezza massima del buffer
 #define MAX_UTENTI 255            // Definiamo il numero massimo di utenti inseribili nella struct
-#define FILE_NAME "Utenti.csv"    // Definiamo il nome del file principale
-#define TEMP_FILE_NAME "Temp.csv" // Definiamo il nome del file temporaneo
+#define FILE_NAME "utenti.csv"    // Definiamo il nome del file principale
+#define TEMP_FILE_NAME "temp.csv" // Definiamo il nome del file temporaneo
 #define ABI "07648"               // Definiamo il Codice dell'Associazione Bancaria Italiana
 #define CAB "05433"               // Definiamo il Codice di Avviamento Bancario
 

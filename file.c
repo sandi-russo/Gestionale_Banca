@@ -154,7 +154,7 @@ void FileUpdate(const char *OldFile, const char *NewFile)
     else // Il file si è aperto
     {
         aperturaFile = true;
-        ChiudiFile(NewFileT, "Per ora niente");
+        ChiudiFile(NewFileT, "UpdateFail: Errore durante la chiusura del file [utenti.csv]");
     }
 
     if (aperturaFile == true) // Elimina l'old file
@@ -165,7 +165,7 @@ void FileUpdate(const char *OldFile, const char *NewFile)
 
     if ((rimozione < 0) || (rinomina < 0))
     {
-        perror("UpdateFail: Errore durante la modifica del file [Utenti.csv]");
+        perror("UpdateFail: Errore durante la modifica del file [utenti.csv]");
         exit(EXIT_FAILURE);
     }
 }
@@ -190,7 +190,7 @@ void Transazione(utente *user, float importo)
 {
     user->Saldo += importo;
     RemoveLine("NomeUtente", user->NomeUtente);
-    Writing(TEMP_FILE_NAME, user->NomeUtente, user->Password, user->IBAN, user->Saldo, user->Nome, user->Cognome);
+    WritingStruct(TEMP_FILE_NAME, user);
 }
 
 bool modificaUtente(utente *user)
@@ -247,7 +247,7 @@ bool modificaUtente(utente *user)
             Sleep(1000); // Pausa
             break;
         case 3:
-            printf("Vecchio Saldo: %f\n", user->Saldo);
+            printf("Vecchio Saldo: %0.2f\n", user->Saldo);
             printf("Inserisci l'importo: ");
             scanf("%f", &saldo);
             user->Saldo = saldo;
@@ -264,7 +264,7 @@ bool modificaUtente(utente *user)
             strcpy(user->Nome, nome);
             contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
-            Sleep(1000); // Pausa
+            Sleep(1000); // Pausmod
             break;
         case 5:
             printf("Vecchio Cognome: %s\n", user->Cognome);
@@ -416,6 +416,19 @@ void Admin()
 
     } while (scelta != 0);
 }
+void bonifico(utente *user, utente *destinatario, float importo)
+{
+    char riga_destinatario[MAX_BUFFER_LEN];
+
+    user->Saldo -= importo;
+    destinatario->Saldo += importo;
+    RemoveLine("NomeUtente", user->NomeUtente);
+    WritingStruct(TEMP_FILE_NAME, user);
+    FileUpdate(FILE_NAME, TEMP_FILE_NAME);
+    RemoveLine("NomeUtente", destinatario->NomeUtente);
+    WritingStruct(TEMP_FILE_NAME, destinatario);
+    FileUpdate(FILE_NAME, TEMP_FILE_NAME);
+}
 
 void Consumer(utente user)
 {
@@ -492,6 +505,45 @@ void Consumer(utente user)
                 printf("\nSaldo insufficiente");
             }
         }
+
+        else if (scelta == 3)
+        {
+            float importoBonifico = 0;
+            char IBANdestinatario[28], rigaDestinatario[MAX_BUFFER_LEN];
+            printf("\nCaricamento in corso...\n");
+            Sleep(1000); // Pausa
+            system("cls");
+            printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+            printf("----------------------------------------------------------------\n");
+            printf("Iserisci l'IBAN del destinatario: ");
+            scanf("%s", IBANdestinatario);
+            if (strcmp(IBANdestinatario, user.IBAN) != 0)
+            {
+                if (SearchInFile("IBAN", IBANdestinatario, rigaDestinatario) == 0)
+                {
+                    printf("Inserisci l'importo del bonifico: ");
+                    scanf("%f", &importoBonifico);
+                    if (importoBonifico <= user.Saldo && importoBonifico > 0)
+                    {
+                        utente destinatario = CreateUserStruct(rigaDestinatario);
+                        bonifico(&user, &destinatario, importoBonifico);
+                    }
+                    else
+                    {
+                        printf("Saldo insufficiente / Formato errato");
+                    }
+                }
+                else
+                {
+                    printf("L'IBAN specificato e' inesistente");
+                }
+            }
+            else
+            {
+                printf("Impossibile effettuare un bonifico indirizzato a se stessi");
+            }
+        }
+
         else if (scelta == 4)
         {
             int scelta2;
@@ -574,7 +626,6 @@ void Login()
                 ChiudiFile(file, "LoginFail: il file non e' stato chiuso correttamente"); // Chiusura file tramite funzione 'ChiudiFile'
                 printf("\nUtente [ %s ] autenticato con successo\n\nIngresso nel conto...\n", user.NomeUtente);
                 Consumer(user);
-                // FileUpdate(FILE_NAME, TEMP_FILE_NAME);
             }
             else
             {
