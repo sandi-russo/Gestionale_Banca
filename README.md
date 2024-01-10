@@ -24,11 +24,15 @@ In aggiunta, un obiettivo centrale del progetto è stato promuovere la cooperazi
 
 Il codice sorgente è organizzato in modo chiaro e modulare:
  
-- Il file "bank.h" funge da header, contenente tutte le strutture di dati e funzioni necessarie per far funzionare il programma;
+- Il file "bank.h" funge da header, contenente tutte le strutture di dati, le librerie e le costanti neccessarie per il corretto funzionamento del programma;
+
+- Il file "bank.c" contiene la definizione delle varie funzioni e la loro implementazione nella simulazione bancaria;
 
 - Il file "main.c" contiene l'esecuzione finale del programma, garantendo una struttura ordinata e comprensibile;
 
-- Il file "utenti.csv" funge da dispositivo di archiviazione permanente, memorizzando in una riga le informazioni riguardanti un singolo utente, organizzate per campi adeguatamente separati, facilitandone la lettura ed aumentando l'efficienza generale del programma.
+- Il file "utenti.csv" funge da dispositivo di archiviazione permanente, memorizzando in una riga le informazioni riguardanti un singolo utente, organizzate per campi adeguatamente separati, facilitandone la lettura ed aumentando l'efficienza generale del programma;
+
+-il file "temp.c", visibile solo durante l'esecuzione di specifici comandi, consente di gestire in modo sicuro e funzionale le modifiche all'archiviazione permanente primaria contenuta "in utenti.csv".
 
 ## Istruzioni per l'Esecuzione
 
