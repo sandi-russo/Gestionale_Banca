@@ -418,8 +418,6 @@ void Admin()
 }
 void bonifico(utente *user, utente *destinatario, float importo)
 {
-    char riga_destinatario[MAX_BUFFER_LEN];
-
     user->Saldo -= importo;
     destinatario->Saldo += importo;
     RemoveLine("NomeUtente", user->NomeUtente);
@@ -428,6 +426,55 @@ void bonifico(utente *user, utente *destinatario, float importo)
     RemoveLine("NomeUtente", destinatario->NomeUtente);
     WritingStruct(TEMP_FILE_NAME, destinatario);
     FileUpdate(FILE_NAME, TEMP_FILE_NAME);
+}
+
+void EliminaConto(utente *user)
+{
+    char password[MAX_STR_LEN], confermaPassword[MAX_STR_LEN], IBAN[28], rigaDestinatario[MAX_BUFFER_LEN];
+    int corrispondono, corretta;
+
+    printf("\nInserisci l'IBAN destinatario: ");
+    scanf("%s", IBAN);
+    if (SearchInFile("IBAN", IBAN, rigaDestinatario) == 0)
+    {
+        utente destinatario = CreateUserStruct(rigaDestinatario);
+
+        do
+        {   
+            printf("Inserisci la tua password: ");
+            scanf("%s", password);
+            printf("Conferma la tua password: ");
+            scanf("%s", confermaPassword);
+
+            corrispondono = strcmp(password, confermaPassword);
+            corretta = strcmp(password, user->Password);
+
+            if (corrispondono != 0)
+            {
+                printf("Le password non corrispondono");
+            }
+            else if (corretta != 0)
+            {
+                printf("Password errata");
+            }
+            Sleep(1000);
+            system("cls");
+            printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user->Nome, user->Cognome, user->Saldo);
+            printf("----------------------------------------------------------------\n");
+            printf("Continuando accetterai di chiudere il conto, eliminando le tue credenziali d'accesso\n");
+            printf("Potrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale\n");
+            printf("----------------------------------------------------------------\n");
+            printf("IBAN destinatario confermato: %s\n", IBAN);
+        } while (corretta != 0 || corrispondono != 0);
+
+        bonifico(user, &destinatario, user->Saldo);
+        RemoveLine("NomeUtente", user->NomeUtente);
+        FileUpdate(FILE_NAME, TEMP_FILE_NAME);
+    }
+    else
+    {
+    printf("L'IBAN specificato non e' esistente");
+    }
 }
 
 void Consumer(utente user)
@@ -456,8 +503,7 @@ void Consumer(utente user)
         if (scanf("%d", &scelta) != 1) // Controlla se l'input è un numero intero
         {
 
-            while (getchar() != '\n') // Pulisce l'input buffer
-                ;
+            while (getchar() != '\n'); // Pulisce l'input buffer
             printf("Il valore inserito non e' valido. Perfavore riprova\n");
 
             printf("\nCaricamento in corso...\n");
@@ -568,8 +614,7 @@ void Consumer(utente user)
                 if (scanf("%d", &scelta2) != 1)
                 {
 
-                    while (getchar() != '\n') // Pulisce l'input buffer
-                        ;
+                    while (getchar() != '\n'); // Pulisce l'input buffer
                     printf("\nIl valore inserito non e' valido. Inserisci [ 0 ] per tornare al conto\n");
                     continue; // Rientra nel ciclo per ottenere un valore corretto
                 }
@@ -580,6 +625,49 @@ void Consumer(utente user)
             } while (scelta2 != 0);
             printf("\nCaricamento in corso...\n");
         }
+
+        else if (scelta == 5)
+        {
+            int scelta3;
+            printf("\nCaricamento in corso...\n");
+            do
+            {   
+                Sleep(1000); // Pausa
+                system("cls");
+                printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+                printf("----------------------------------------------------------------\n");
+                printf("Continuando accetterai di chiudere il conto, eliminando le tue credenziali d'accesso\n");
+                printf("Potrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale\n");
+                printf("----------------------------------------------------------------\n");
+                printf("\n1 - Continua e chiudi il conto\n\n");
+                printf("----------------------------------------------------------------\n");
+                printf("0 - Annulla e torna al conto\n");
+                printf("----------------------------------------------------------------\n");
+                printf("\nIserisci un'opzione: ");
+                if (scanf("%d", &scelta3) != 1) // Controlla se l'input è un numero intero
+                {
+
+                    while (getchar() != '\n'); // Pulisce l'input buffer
+                    printf("Il valore inserito non e' valido. Perfavore riprova\n");
+                    printf("\nCaricamento in corso...\n");
+                    continue; // Rientra nel ciclo per ottenere un valore corretto
+                }
+
+                if (scelta3 == 1)
+                {   
+                    system("cls");
+                    printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
+                    printf("----------------------------------------------------------------\n");
+                    printf("Continuando accetterai di chiudere il conto, eliminando le tue credenziali d'accesso\n");
+                    printf("Potrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale\n");
+                    printf("----------------------------------------------------------------");
+                    EliminaConto(&user);
+                    printf("\nConto eliminato con successo. Reindirizzamento al menu in corso...");
+                    scelta = 0;
+                }
+            } while (scelta3 != 0 && scelta3 != 1);
+        }
+
         else if (scelta == 0)
         {
             FileUpdate(FILE_NAME, TEMP_FILE_NAME);
