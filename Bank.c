@@ -161,6 +161,7 @@ void FileUpdate(const char *OldFile, const char *NewFile)
     {
         rimozione = remove(OldFile);
         rinomina = rename(NewFile, OldFile);
+        aperturaFile = false;
     }
 
     if ((rimozione < 0) || (rinomina < 0))
@@ -529,6 +530,7 @@ void Consumer(utente user)
             else
             {
                 Transazione(&user, importo);
+                FileUpdate(FILE_NAME, TEMP_FILE_NAME);
                 printf("\nVersamento effettuato. L'importo versato sara' disponibile immediatamente\n");
             }
         }
@@ -544,6 +546,7 @@ void Consumer(utente user)
             if (importo <= user.Saldo)
             {
                 Transazione(&user, -importo);
+                FileUpdate(FILE_NAME, TEMP_FILE_NAME);
                 printf("\nPrelievo effettuato. Ritira i contanti dallo sportello in basso");
             }
             else
@@ -670,7 +673,6 @@ void Consumer(utente user)
 
         else if (scelta == 0)
         {
-            FileUpdate(FILE_NAME, TEMP_FILE_NAME);
             printf("\nReindirizzamento al menu in corso...\n");
         }
         else
