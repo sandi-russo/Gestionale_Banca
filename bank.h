@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <ctype.h>
+
 
 #ifdef _WIN32
 #include <windows.h>

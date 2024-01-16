@@ -222,7 +222,7 @@ bool modificaUtente(utente *user)
             FileUpdate(FILE_NAME, TEMP_FILE_NAME);
             contatoreModifiche = 0;
             printf("Uscita In corso...\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             fineLoop = true;
             return fineLoop;
             break;
@@ -232,10 +232,15 @@ bool modificaUtente(utente *user)
             RemoveLine("NomeUtente", user->NomeUtente);
             printf("Inserisci nuovo Nome Utente: ");
             scanf("%s", nomeutente);
+            for (int i = 0; nomeutente[i]; i++)
+            {
+                nomeutente[i] = tolower(nomeutente[i]);
+            }
+
             strcpy(user->NomeUtente, nomeutente);
             printf("Modifica Eseguita con successo!\n");
             contatoreModifiche++;
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             break;
         case 2:
             printf("Vecchia Password: %s\n", user->Password);
@@ -245,7 +250,7 @@ bool modificaUtente(utente *user)
             strcpy(user->Password, password);
             printf("Modifica Eseguita con successo!\n");
             contatoreModifiche++;
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             break;
         case 3:
             printf("Vecchio Saldo: %0.2f\n", user->Saldo);
@@ -255,7 +260,7 @@ bool modificaUtente(utente *user)
             RemoveLine("IBAN", user->IBAN);
             contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             break;
         case 4:
             printf("Vecchio Nome: %s\n", user->Nome);
@@ -265,7 +270,7 @@ bool modificaUtente(utente *user)
             strcpy(user->Nome, nome);
             contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
-            Sleep(1000); // Pausmod
+            sleep(2000); // Pausmod
             break;
         case 5:
             printf("Vecchio Cognome: %s\n", user->Cognome);
@@ -275,7 +280,7 @@ bool modificaUtente(utente *user)
             strcpy(user->Cognome, cognome);
             contatoreModifiche++;
             printf("Modifica Eseguita con successo!\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             break;
         case 6:
             if (contatoreModifiche > 0)
@@ -287,13 +292,13 @@ bool modificaUtente(utente *user)
             else
             {
                 printf("Non hai apportato modifiche all'utente selezionato.");
-                Sleep(1000); // Pausa
+                sleep(2000); // Pausa
             }
             break;
         default:
             system("cls");
             printf("InputFail: non puoi insere numeri diversi da quelli che sono scritti!\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             break;
         }
     } while (fineLoop != true);
@@ -356,7 +361,7 @@ void utentiModifiche(FILE *f)
         {
         case 0:
             printf("Uscita In corso...\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             fineModifiche = true;
             fineModificheUtente = true;
             break;
@@ -375,7 +380,7 @@ void utentiModifiche(FILE *f)
         default:
             system("cls");
             printf("InputFail: non puoi insere numeri diversi da quelli che sono scritti!\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             break;
         }
 
@@ -411,7 +416,7 @@ void Admin()
         default:
             system("cls");
             printf("InputFail: non puoi insere numeri diversi da quelli che sono scritti!\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             break;
         }
 
@@ -441,7 +446,7 @@ void EliminaConto(utente *user)
         utente destinatario = CreateUserStruct(rigaDestinatario);
 
         do
-        {   
+        {
             printf("Inserisci la tua password: ");
             scanf("%s", password);
             printf("Conferma la tua password: ");
@@ -458,7 +463,7 @@ void EliminaConto(utente *user)
             {
                 printf("Password errata");
             }
-            Sleep(1000);
+            sleep(2000);
             system("cls");
             printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user->Nome, user->Cognome, user->Saldo);
             printf("----------------------------------------------------------------\n");
@@ -474,7 +479,7 @@ void EliminaConto(utente *user)
     }
     else
     {
-    printf("L'IBAN specificato non e' esistente");
+        printf("L'IBAN specificato non e' esistente");
     }
 }
 
@@ -485,7 +490,7 @@ void Consumer(utente user)
 
     do // Ciclo di visualizzazione menu
     {
-        Sleep(1000); // Pausa
+        sleep(2000); // Pausa
         system("cls");
 
         printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
@@ -504,24 +509,26 @@ void Consumer(utente user)
         if (scanf("%d", &scelta) != 1) // Controlla se l'input è un numero intero
         {
 
-            while (getchar() != '\n'); // Pulisce l'input buffer
+            while (getchar() != '\n')
+                ; // Pulisce l'input buffer
+            system("color 04");
             printf("Il valore inserito non e' valido. Perfavore riprova\n");
 
             printf("\nCaricamento in corso...\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             system("cls");
-
             continue; // Rientra nel ciclo per ottenere un valore corretto
+            system("color 07");
         }
 
         if (scelta == 1) // Scelta dell'opzione
         {
             printf("\nCaricamento in corso...\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             system("cls");
             printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
             printf("----------------------------------------------------------------\n");
-            printf("Iserisci l'importo da versare: ");
+            printf("Inserisci l'importo da versare: ");
             scanf("%f", &importo);
             if (importo < 0)
             {
@@ -537,13 +544,18 @@ void Consumer(utente user)
         else if (scelta == 2)
         {
             printf("\nCaricamento in corso...\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             system("cls");
             printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
             printf("----------------------------------------------------------------\n");
-            printf("Iserisci l'importo da prelevare: ");
+            printf("Inserisci l'importo da prelevare: ");
             scanf("%f", &importo);
-            if (importo <= user.Saldo)
+
+            if (importo <= 0)
+            {
+                printf("\nL'importo deve essere maggiore di zero. Operazione annullata.\n");
+            }
+            else if (importo <= user.Saldo)
             {
                 Transazione(&user, -importo);
                 FileUpdate(FILE_NAME, TEMP_FILE_NAME);
@@ -560,11 +572,11 @@ void Consumer(utente user)
             float importoBonifico = 0;
             char IBANdestinatario[28], rigaDestinatario[MAX_BUFFER_LEN];
             printf("\nCaricamento in corso...\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             system("cls");
             printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
             printf("----------------------------------------------------------------\n");
-            printf("Iserisci l'IBAN del destinatario: ");
+            printf("Inserisci l'IBAN del destinatario: ");
             scanf("%s", IBANdestinatario);
             if (strcmp(IBANdestinatario, user.IBAN) != 0)
             {
@@ -599,7 +611,7 @@ void Consumer(utente user)
             printf("\nCaricamento in corso...\n");
             do
             {
-                Sleep(1000); // Pausa
+                sleep(2000); // Pausa
                 system("cls");
                 printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
                 printf("----------------------------------------------------------------\n");
@@ -617,13 +629,18 @@ void Consumer(utente user)
                 if (scanf("%d", &scelta2) != 1)
                 {
 
-                    while (getchar() != '\n'); // Pulisce l'input buffer
+                    while (getchar() != '\n')
+                        ; // Pulisce l'input buffer
+                    system("color 04");
                     printf("\nIl valore inserito non e' valido. Inserisci [ 0 ] per tornare al conto\n");
+                    system("color 07");
                     continue; // Rientra nel ciclo per ottenere un valore corretto
                 }
                 if (scelta2 != 0)
                 {
+                    system("color 04");
                     printf("\nIl valore inserito non e' valido. Inserisci [ 0 ] per tornare al conto\n");
+                    system("color 07");
                 }
             } while (scelta2 != 0);
             printf("\nCaricamento in corso...\n");
@@ -634,8 +651,8 @@ void Consumer(utente user)
             int scelta3;
             printf("\nCaricamento in corso...\n");
             do
-            {   
-                Sleep(1000); // Pausa
+            {
+                sleep(2000); // Pausa
                 system("cls");
                 printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
                 printf("----------------------------------------------------------------\n");
@@ -646,18 +663,22 @@ void Consumer(utente user)
                 printf("----------------------------------------------------------------\n");
                 printf("0 - Annulla e torna al conto\n");
                 printf("----------------------------------------------------------------\n");
-                printf("\nIserisci un'opzione: ");
+                printf("\nInserisci un'opzione: ");
                 if (scanf("%d", &scelta3) != 1) // Controlla se l'input è un numero intero
                 {
 
-                    while (getchar() != '\n'); // Pulisce l'input buffer
+                    while (getchar() != '\n')
+                        ; // Pulisce l'input buffer
+                    system(2000);
+                    system("color 04");
                     printf("Il valore inserito non e' valido. Perfavore riprova\n");
+                    system("color 07");
                     printf("\nCaricamento in corso...\n");
                     continue; // Rientra nel ciclo per ottenere un valore corretto
                 }
 
                 if (scelta3 == 1)
-                {   
+                {
                     system("cls");
                     printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
                     printf("----------------------------------------------------------------\n");
@@ -677,7 +698,9 @@ void Consumer(utente user)
         }
         else
         {
+            system("color 04");
             printf("\nIl valore inserito non e' valido. Perfavore riprova\n"); // Gestisci input non validi
+            system("color 07");
         }
     } while (scelta != 0);
 }
@@ -692,7 +715,7 @@ void Login()
     while (!daticorretti && tentativi > 0) // Ciclo visualizzazione menu di autenticazione
     {
         printf("\nCaricamento in corso...\n");
-        Sleep(1000); // Pausa
+        sleep(2000); // Pausa
         system("cls");
         printf("Accedi con le tue credenziali | Tentativi rimasti: %d\n", tentativi);
         printf("----------------------------------------------------------------\n");
@@ -785,15 +808,26 @@ void Register()
     do // Ciclo visualizzazione menu registrazione
     {
         printf("\nCaricamento in corso...\n");
-        Sleep(1000); // Pausa
+        sleep(2000); // Pausa
         system("cls");
 
         printf("Compila il seguente form per aprire il conto\n");
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
 
         printf("Inserisci il tuo nome: ");
-        scanf("%s", Nome);
+        // scanf("%s", Nome);
+        fgets(Nome, MAX_STR_LEN, stdin);
+
+        Nome[strcspn(Nome, "\n")] = '\0'; // Rimuove il carattere newline dalla fine della stringa
+
+
         printf("Inserisci il tuo cognome: ");
-        scanf("%s", Cognome);
+        fgets(Cognome, MAX_STR_LEN, stdin);
+
+        Cognome[strcspn(Cognome, "\n")] = '\0'; // Rimuove il carattere newline dalla fine della stringa
+
+        // scanf("%s", Cognome);
         printf("Inserisci un nome utente: ");
         scanf("%s", NomeUtente);
         printf("Inserisci una password: ");
@@ -838,7 +872,7 @@ void Banca()
 {
     int scelta;
 
-    Sleep(1000); // Pausa
+    sleep(2000); // Pausa
     system("cls");
     do // Ciclo visualizzazione menu banca
     {
@@ -855,9 +889,11 @@ void Banca()
         if (scanf("%d", &scelta) != 1) // Controlla se l'input è un numero intero
         {
             while (getchar() != '\n') // Pulisce l'input buffer
-                printf("\nIl valore inserito non e' valido. Perfavore riprova\n");
+                system("color 04");
+            printf("\nIl valore inserito non e' valido. Perfavore riprova\n");
+            system("color 07");
             printf("\nCaricamento in corso...\n");
-            Sleep(1000); // Pausa
+            sleep(2000); // Pausa
             system("cls");
             continue; // Rientra nel ciclo per ottenere un valore corretto
         }
@@ -876,9 +912,11 @@ void Banca()
         }
         else
         {
+            system("color 04");
             printf("\nIl valore inserito non e' valido. Perfavore riprova\n"); // Gestisci input non validi
+            system("color 07");
         }
-        Sleep(1000); // Pausa
+        sleep(2000); // Pausa
         system("cls");
     } while (scelta != 0); // Fino a quando la scelta è diversa da 0, ripete il ciclo
 }
