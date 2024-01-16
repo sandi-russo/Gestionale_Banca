@@ -543,7 +543,11 @@ void Consumer(utente user)
             printf("----------------------------------------------------------------\n");
             printf("Iserisci l'importo da prelevare: ");
             scanf("%f", &importo);
-            if (importo <= user.Saldo)
+                       if (importo <= 0)
+            {
+                printf("\nL'importo deve essere maggiore di zero. Operazione annullata.\n");
+            }
+            else if (importo <= user.Saldo)
             {
                 Transazione(&user, -importo);
                 FileUpdate(FILE_NAME, TEMP_FILE_NAME);
