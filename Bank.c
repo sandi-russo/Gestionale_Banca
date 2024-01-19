@@ -1,4 +1,4 @@
-#include "bank.h"
+#include "Main.h"
 
 char Nome[100], Cognome[100], NomeUtente[100], Password[100], ConfermaPassword[100], IBAN[28]; // Dichiarazione variabili per il form di Login e di Registrazione3
 
@@ -235,7 +235,7 @@ bool modificaUtente(utente *user)
             strcpy(user->NomeUtente, nomeutente);
             printf("Modifica Eseguita con successo!\n");
             contatoreModifiche++;
-            Sleep(1000); // Pausa
+            sleep(1000); // Pausa
             break;
         case 2:
             printf("Vecchia Password: %s\n", user->Password);
