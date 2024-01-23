@@ -235,7 +235,7 @@ bool modificaUtente(utente *user)
             strcpy(user->NomeUtente, nomeutente);
             printf("Modifica Eseguita con successo!\n");
             contatoreModifiche++;
-            sleep(1000); // Pausa
+            Sleep(1000); // Pausa
             break;
         case 2:
             printf("Vecchia Password: %s\n", user->Password);
@@ -282,6 +282,7 @@ bool modificaUtente(utente *user)
             {
                 RemoveLine("IBAN", user->IBAN);
                 WritingStruct(TEMP_FILE_NAME, user);
+                FileUpdate(FILE_NAME, TEMP_FILE_NAME); // SOS
                 contatoreModifiche = 0;
             }
             else
