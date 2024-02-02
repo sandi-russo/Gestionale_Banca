@@ -180,6 +180,7 @@ void EditUser(Nodo *head, int numeroUtenti)
                     printf("Errore nella lettura dell'input.\n");
                     exit(EXIT_FAILURE);
                 }
+                ToLower(current->utente.NomeUtente);
                 current->utente.NomeUtente[strcspn(current->utente.NomeUtente, "\n")] = '\0'; // Rimuovi il carattere di nuova riga
                 edits++;
                 break;

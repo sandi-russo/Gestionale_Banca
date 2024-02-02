@@ -17,6 +17,7 @@ void Login()
         printf("----------------------------------------------------------------\n");
         printf("Inserisci il tuo nome utente: ");
         scanf("%s", InputNomeUtente);
+        ToLower(InputNomeUtente);
         pulisciBuffer();
         printf("Inserisci la tua password: ");
         scanf("%s", InputPassword);

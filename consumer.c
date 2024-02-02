@@ -344,9 +344,9 @@ void Register()
 
         Delimiter = 0; // Inizializzo il flag Delimiter a falso
 
+        ToLower(NomeUtente);
         for (int i = 0; NomeUtente[i]; i++) // Verifica se l'utentente inserisce un punto e virgola
         {
-            NomeUtente[i] = tolower(NomeUtente[i]);
             if (NomeUtente[i] == ';' || Nome[i] == ';' || Cognome[i] == ';' || Password[i] == ';' || ConfermaPassword[i] == ';')
             {
                 Delimiter = 1;

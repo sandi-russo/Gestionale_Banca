@@ -370,4 +370,12 @@ int CountUserNum()
     return numero_utenti - 1; // Tolto l'utente amministratore
 }
 
+void ToLower(char Stringa[])
+{
+    for (int i = 0; Stringa[i]; i++) // Verifica se l'utentente inserisce un punto e virgola
+        {
+            Stringa[i] = tolower(Stringa[i]);
+        }
+}
+
 #endif // GENERAL_C
