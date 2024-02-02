@@ -1,6 +1,6 @@
 #include "main.h"
 
-#ifndef GENERAL_C  // Include guard per evitare inclusioni multiple
+#ifndef GENERAL_C // Include guard per evitare inclusioni multiple
 #define GENERAL_C
 /*
     La funzione serve a pulire eventuali buffer rimasti in input da tastiera tramite
@@ -9,7 +9,8 @@
 void pulisciBuffer()
 {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
 }
 
 /*
@@ -17,8 +18,8 @@ void pulisciBuffer()
     Secondo parametro: intero (Valore Minimo)
     Terzo parametro: intero (Valore Massimo)
 
-    La funzione stampa il messaggio e prende in input il valore dell'utente 
-    verificando che sia un intero compreso tra i valori specificati. 
+    La funzione stampa il messaggio e prende in input il valore dell'utente
+    verificando che sia un intero compreso tra i valori specificati.
     La funzione e' ottimizzata per numeri naturali positivi.
 
     Return: int input se il valore inserito e' corretto
@@ -48,7 +49,7 @@ int ReadInputChoice(const char *messaggio, int minimo, int massimo)
             return -1;
         }
         else if (input < minimo || input > massimo)
-        {   
+        {
             if (massimo != minimo)
             {
                 printf("Inserire un numero compreso tra %d e %d\n", minimo, massimo);
@@ -58,7 +59,7 @@ int ReadInputChoice(const char *messaggio, int minimo, int massimo)
                 printf("Inserisci %d per continuare\n", minimo);
             }
 
-            return - 1;
+            return -1;
         }
     } while (conversione != 1 || input < minimo || input > massimo);
 
@@ -70,7 +71,7 @@ int ReadInputChoice(const char *messaggio, int minimo, int massimo)
     Secondo parametro: array di caratteri (Modalita' di Apertura)
     Terzo parametro: array di caratteri (Messaggio di Errore)
 
-    La funzione apre il file con il nome e modalita' specificate. 
+    La funzione apre il file con il nome e modalita' specificate.
     In caso di errore, stampa il messaggio specificato.
 */
 FILE *ApriFile(const char *nomeFile, const char *modalita, const char *messaggioErrore)
@@ -78,7 +79,9 @@ FILE *ApriFile(const char *nomeFile, const char *modalita, const char *messaggio
     FILE *file = fopen(nomeFile, modalita); // Apertura file
     if (!file)                              // Se il file non si è aperto, mostra un determinato messaggio di errore
     {
+        printf("\033[0;31m");    // Sequenza di escape per il colore rosso
         perror(messaggioErrore); // Stampiamo un messaggio prima del codice di errore stesso
+        printf("\033[0m");       // Sequenza di escape per il colore predefinito
         exit(EXIT_FAILURE);
     }
     return file;
@@ -94,14 +97,16 @@ void ChiudiFile(FILE *file, const char *messaggioErrore)
 {
     if (fclose(file) != 0) // Se il file non si è chiuso, mostra un determinato messaggio di errore
     {
+        printf("\033[0;31m");    // Sequenza di escape per il colore rosso
         perror(messaggioErrore); // Stampiamo un messaggio prima del codice di errore stesso
+        printf("\033[0m");       // Sequenza di escape per il colore predefinito
         exit(EXIT_FAILURE);
     }
 }
 
 /*
     La funzione verifica se esiste il file FILE_NAME tramite la modalita' "r".
-    Se non esiste, allora crea il file tramite la modalita' "w" scrivendo al 
+    Se non esiste, allora crea il file tramite la modalita' "w" scrivendo al
     suo interno le due righe di intestazione (header e admin).
 */
 void IsFileExists()
@@ -144,7 +149,9 @@ int UserExists(const char *InputNomeUtente)
 
         if (strcmp(InputNomeUtente, StoredNomeUtente) == 0)
         {
+            printf("\033[0;31m"); // Sequenza di escape per il colore rosso
             printf("\nUtente [%s] gia' registrato. Riprova\n", InputNomeUtente);
+            printf("\033[0m");                                            // Sequenza di escape per il colore predefinito
             ChiudiFile(file, "UserFail: errore nella chiusura del file"); // Chiusura file tramite funzione 'ChiudiFile'
             return 1;                                                     // Indica che il nome utente esiste nel file
         }
@@ -170,9 +177,9 @@ int UserExists(const char *InputNomeUtente)
 int SearchInFile(const char *colonna, const char *valore, char *rigaVuota)
 {
     FILE *file = ApriFile(FILE_NAME, "r", "SearchFail: errore nell'apertura del file"); // Apertura file tramite funzione 'ApriFile'
-    char rigaTemp[MAX_STR_LEN]; // Dichiaro la riga temporanea dove inserire il valore temporaneo
-    char riga[MAX_STR_LEN];     // Dichiaro riga dove ci sarà il valore originale
-    char *token;                // Dichiaro il delimitatore
+    char rigaTemp[MAX_STR_LEN];                                                         // Dichiaro la riga temporanea dove inserire il valore temporaneo
+    char riga[MAX_STR_LEN];                                                             // Dichiaro riga dove ci sarà il valore originale
+    char *token;                                                                        // Dichiaro il delimitatore
     int indiceColonna = -1, userExists = 0, columnExists = 0;
     if (fgets(riga, MAX_BUFFER_LEN, file) != NULL) // Leggi il file e cerca la colonna specificata
     {
@@ -229,14 +236,18 @@ void RemoveLine(const char *colonna, const char *valore)
     char RigaUtente[MAX_STR_LEN];
     if (SearchInFile(colonna, valore, RigaUtente) < 0) // Cerca la riga contenente il valore specificato nella colonna specificata
     {
+        printf("\033[0;31m"); // Sequenza di escape per il colore rosso
         printf("SearchFail: la colonna specificata non esiste nel file.\n");
+        printf("\033[0m");                                                           // Sequenza di escape per il colore predefinito
         ChiudiFile(file, "EditFail: errore nella chiusura del file originale");      // Chiusura file tramite funzione 'ChiudiFile'
         ChiudiFile(fileTemp, "EditFail: errore nella chiusura del file temporaneo"); // Chiusura file tramite funzione 'ChiudiFile'
         return;
     }
     else if (SearchInFile(colonna, valore, RigaUtente) > 0)
     {
+        printf("\033[0;31m"); // Sequenza di escape per il colore rosso
         printf("SearchFail: l'elemento specificato non esiste nella colonna indicata.\n");
+        printf("\033[0m");                                                           // Sequenza di escape per il colore predefinito
         ChiudiFile(file, "EditFail: errore nella chiusura del file originale");      // Chiusura file tramite funzione 'ChiudiFile'
         ChiudiFile(fileTemp, "EditFail: errore nella chiusura del file temporaneo"); // Chiusura file tramite funzione 'ChiudiFile'
         return;
@@ -285,7 +296,9 @@ void FileUpdate(const char *OldFile, const char *NewFile)
     }
     if ((rimozione < 0) || (rinomina < 0)) // Gestisce gli errori di remove e rename
     {
+        printf("\033[0;31m"); // Sequenza di escape per il colore rosso
         perror("UpdateFail: Errore durante la modifica del file [utenti.csv]");
+        printf("\033[0m"); // Sequenza di escape per il colore predefinito
         exit(EXIT_FAILURE);
     }
 }
@@ -362,7 +375,8 @@ int CountUserNum()
     }
 
     // Conta il numero di utenti nel file
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while (fgets(line, sizeof(line), file) != NULL)
+    {
         numero_utenti++;
     }
 
@@ -373,9 +387,19 @@ int CountUserNum()
 void ToLower(char Stringa[])
 {
     for (int i = 0; Stringa[i]; i++) // Verifica se l'utentente inserisce un punto e virgola
-        {
-            Stringa[i] = tolower(Stringa[i]);
-        }
+    {
+        Stringa[i] = tolower(Stringa[i]);
+    }
+}
+
+void Divisore()
+{
+    int n = 80; // Numero di -
+    for (int i = 0; i <= n; i++)
+    {
+        printf("-");
+    }
+    printf("\n");
 }
 
 #endif // GENERAL_C

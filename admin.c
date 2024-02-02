@@ -1,16 +1,17 @@
 #include "general.c"
 
 // Funzione per scrivere la lista dinamica in un file csv temporaneo
-int SaveListToCSV(const char *FileName, Nodo* head)
+int SaveListToCSV(const char *FileName, Nodo *head)
 {
-    FILE* file = ApriFile(FileName, "w", "ListWriteError: Errore nell'apertura del file");
+    FILE *file = ApriFile(FileName, "w", "ListWriteError: Errore nell'apertura del file");
     // Stampa l'intestazione
     fprintf(file, "NomeUtente;Password;IBAN;Saldo;Nome;Cognome;\n");
     fprintf(file, "admin_code;@UniCode2024;IT00A0000000000000000000000;0.00;Admin;Admin;\n");
 
-    Nodo* current = head;
+    Nodo *current = head;
 
-    while (current != NULL) {
+    while (current != NULL)
+    {
         // Stampa i dati di ogni utente
         fprintf(file, "%s;%s;%s;%.2f;%s;%s;\n",
                 current->utente.NomeUtente,
@@ -23,34 +24,32 @@ int SaveListToCSV(const char *FileName, Nodo* head)
         current = current->next;
     }
 
-    ChiudiFile(file, "ListWriteError: Errore nella chiusura del file");
-    return 1;  // Ritorna 1 se l'operazione è riuscita
+    ChiudiFile(file, "ListWriteError: Errore nella chiusura del file.");
+    return 1; // Ritorna 1 se l'operazione è riuscita
 }
 
 // Funzione per stampare un singolo nodo della lista dinamica
 void PrintUser(Nodo *current)
 {
-    printf("Nome Utente: %s\n", current->utente.NomeUtente);
-    printf("Password: %s\n", current->utente.Password);
-    printf("IBAN: %s\n", current->utente.IBAN);
-    printf("Saldo: %.2f\n", current->utente.Saldo);
-    printf("Nome: %s\n", current->utente.Nome);
-    printf("Cognome: %s\n", current->utente.Cognome);
-    printf("----------------------------------------------------------------\n");
+    printf("Nome Utente: %-23s | Password: %s\n", current->utente.NomeUtente, current->utente.Password);
+    printf("IBAN: %-30s | Saldo: %.2f\n", current->utente.IBAN, current->utente.Saldo);
+    printf("Nome: %-30s | Cognome: %s\n", current->utente.Nome, current->utente.Cognome);
+    Divisore();
 }
 
 // Funzione che crea una lista dinamica dal file csv principale
-Nodo* ListFromCSV()
+Nodo *ListFromCSV()
 {
-    FILE* file = ApriFile(FILE_NAME, "r", "ListError: Errore nell'apertura del file");
+    FILE *file = ApriFile(FILE_NAME, "r", "ListError: Errore nell'apertura del file.");
 
-    Nodo* head = NULL;
-    Nodo* tail = NULL;
+    Nodo *head = NULL;
+    Nodo *tail = NULL;
 
     char buffer[MAX_BUFFER_LEN];
-    fgets(buffer, MAX_BUFFER_LEN, file);  // Ignora la prima riga (intestazione)
+    fgets(buffer, MAX_BUFFER_LEN, file); // Ignora la prima riga (intestazione)
 
-    while (fgets(buffer, MAX_BUFFER_LEN, file) != NULL) {
+    while (fgets(buffer, MAX_BUFFER_LEN, file) != NULL)
+    {
         utente nuovoUtente;
         sscanf(buffer, "%[^;];%[^;];%[^;];%f;%[^;];%[^;];",
                nuovoUtente.NomeUtente,
@@ -61,15 +60,17 @@ Nodo* ListFromCSV()
                nuovoUtente.Cognome);
 
         // Salta l'utente amministratore
-        if (strcmp(nuovoUtente.NomeUtente, "admin_code") == 0) {
+        if (strcmp(nuovoUtente.NomeUtente, "admin_code") == 0)
+        {
             continue;
         }
 
-        Nodo* nuovoNodo = (Nodo*)malloc(sizeof(Nodo)); 
+        Nodo *nuovoNodo = (Nodo *)malloc(sizeof(Nodo));
         nuovoNodo->utente = nuovoUtente;
         nuovoNodo->next = NULL;
 
-        if (head == NULL) {
+        if (head == NULL)
+        {
             head = tail = nuovoNodo;
         }
         else
@@ -79,20 +80,20 @@ Nodo* ListFromCSV()
         }
     }
 
-    ChiudiFile(file, "ListError: Errore nella chiusura del file");
+    ChiudiFile(file, "ListError: Errore nella chiusura del file.");
     return head;
 }
 
 // Funzione che stampa gli elementi della lista dinamica
-void PrintUserList(Nodo* head)
+void PrintUserList(Nodo *head)
 {
     Sleep(1000);
     system("cls");
-    Nodo* current = head;
-    int indice = 1;  // Inizializza l'indice a 1
+    Nodo *current = head;
+    int indice = 1; // Inizializza l'indice a 1
 
     printf("Unicode Bank | Lista utenti:\n");
-    printf("----------------------------------------------------------------\n");
+    Divisore();
     while (current != NULL)
     {
         printf("ID utente: %d\n", indice);
@@ -103,12 +104,12 @@ void PrintUserList(Nodo* head)
 }
 
 // Funzione per liberare la memoria allocata per ogni singolo nodo della lista dinamica
-void FreeUserList(Nodo* head)
+void FreeUserList(Nodo *head)
 {
-    Nodo* current = head;
+    Nodo *current = head;
     while (current != NULL)
     {
-        Nodo* next = current->next;
+        Nodo *next = current->next;
         free(current);
         current = next;
     }
@@ -129,7 +130,9 @@ void EditUser(Nodo *head, int numeroUtenti)
 
         if (sceltaUtente == 0)
         {
+            printf("\033[0;34m"); // Sequenza di escape per il colore blu
             printf("Reindirizzamento al menu di amministrazione in corso...\n");
+            printf("\033[0m"); // Sequenza di escape per il colore predefinito
             break;
         }
 
@@ -144,40 +147,51 @@ void EditUser(Nodo *head, int numeroUtenti)
 
         if (current == NULL || count != sceltaUtente)
         {
-            printf("Utente non trovato\n");
+            printf("\033[0;31m"); // Sequenza di escape per il colore rosso
+            printf("Utente non trovato.\n");
+            printf("\033[0m"); // Sequenza di escape per il colore predefinito
             continue;
         }
 
-        do {
+        do
+        {
             Sleep(1000);
             system("cls");
             printf("Utente: %d\n", sceltaUtente);
             PrintUser(current);
-            printf("Modifiche effettuate: %d | Scegli il parametro da modificare:\n", edits);
-            printf("----------------------------------------------------------------\n");
+            printf("\033[0;32m"); // Sequenza di escape per il colore verde
+            printf("Modifiche effettuate: %-14d | Scegli il parametro da modificare:\n", edits);
+            printf("\033[0m"); // Sequenza di escape per il colore predefinito
+            Divisore();
+            printf("\n");
             printf("1 - Nome Utente\n");
             printf("2 - Password\n");
             printf("3 - IBAN\n");
             printf("4 - Saldo\n");
             printf("5 - Nome\n");
             printf("6 - Cognome\n\n");
-            printf("----------------------------------------------------------------\n");
+            Divisore();
             printf("7 - Applica modifiche\n");
             printf("0 - Esci\n");
-            printf("----------------------------------------------------------------\n");
+            Divisore();
 
             sceltaParametro = ReadInputChoice("Inserisci il numero corrispondente alla tua scelta: ", 0, 7);
 
             switch (sceltaParametro)
             {
             case 0:
+                printf("\033[0;34m"); // Sequenza di escape per il colore blu
                 printf("Uscita in corso...\n");
+                printf("\033[0m"); // Sequenza di escape per il colore predefinito
                 break;
             case 1:
                 printf("Nome Utente corrente: %s\n", current->utente.NomeUtente);
                 printf("Nuovo Nome Utente: ");
-                if (fgets(current->utente.NomeUtente, sizeof(current->utente.NomeUtente), stdin) == NULL) {
+                if (fgets(current->utente.NomeUtente, sizeof(current->utente.NomeUtente), stdin) == NULL)
+                {
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                     printf("Errore nella lettura dell'input.\n");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
                     exit(EXIT_FAILURE);
                 }
                 ToLower(current->utente.NomeUtente);
@@ -186,10 +200,12 @@ void EditUser(Nodo *head, int numeroUtenti)
                 break;
             case 2:
                 printf("Password corrente: %s\n", current->utente.Password);
-                printf("Nuova Password: ");
+                printf("Nuova password: ");
                 if (fgets(current->utente.Password, sizeof(current->utente.Password), stdin) == NULL)
                 {
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                     printf("Errore nella lettura dell'input.\n");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
                     exit(EXIT_FAILURE);
                 }
                 current->utente.Password[strcspn(current->utente.Password, "\n")] = '\0'; // Rimuovi il carattere di nuova riga
@@ -200,7 +216,9 @@ void EditUser(Nodo *head, int numeroUtenti)
                 printf("Nuovo IBAN: ");
                 if (fgets(current->utente.IBAN, sizeof(current->utente.IBAN), stdin) == NULL)
                 {
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                     printf("Errore nella lettura dell'input.\n");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
                     exit(EXIT_FAILURE);
                 }
                 current->utente.IBAN[strcspn(current->utente.IBAN, "\n")] = '\0'; // Rimuovi il carattere di nuova riga
@@ -211,7 +229,9 @@ void EditUser(Nodo *head, int numeroUtenti)
                 printf("Nuovo Saldo: ");
                 if (fgets(buffer, sizeof(buffer), stdin) == NULL)
                 {
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                     printf("Errore nella lettura dell'input.\n");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
                     exit(EXIT_FAILURE);
                 }
                 sscanf(buffer, "%f", &current->utente.Saldo);
@@ -222,7 +242,9 @@ void EditUser(Nodo *head, int numeroUtenti)
                 printf("Nuovo Nome: ");
                 if (fgets(current->utente.Nome, sizeof(current->utente.Nome), stdin) == NULL)
                 {
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                     printf("Errore nella lettura dell'input.\n");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
                     exit(EXIT_FAILURE);
                 }
                 current->utente.Nome[strcspn(current->utente.Nome, "\n")] = '\0'; // Rimuovi il carattere di nuova riga
@@ -233,26 +255,34 @@ void EditUser(Nodo *head, int numeroUtenti)
                 printf("Nuovo Cognome: ");
                 if (fgets(current->utente.Cognome, sizeof(current->utente.Cognome), stdin) == NULL)
                 {
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                     printf("Errore nella lettura dell'input.\n");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
                     exit(EXIT_FAILURE);
                 }
                 current->utente.Cognome[strcspn(current->utente.Cognome, "\n")] = '\0'; // Rimuovi il carattere di nuova riga
-                edits++; 
+                edits++;
                 break;
             case 7:
                 if (edits > 0)
-                    {   
-                        printf("Salvataggio delle modifiche in corso...\n");
-                        FileUpdate(FILE_NAME, TEMP_FILE_NAME);
-                        edits = 0;
-                    }
-                    else
-                    {
-                        printf("Non ci sono modifiche da salvare");
-                    }
+                {
+                    printf("\033[0;34m"); // Sequenza di escape per il colore blu
+                    printf("Salvataggio delle modifiche in corso...\n");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
+                    FileUpdate(FILE_NAME, TEMP_FILE_NAME);
+                    edits = 0;
+                }
+                else
+                {
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
+                    printf("Non ci sono modifiche da salvare.");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
+                }
                 break;
             default:
-                printf("Scelta non valida\n");
+                printf("\033[0;31m"); // Sequenza di escape per il colore rosso
+                printf("Scelta non valida.\n");
+                printf("\033[0m"); // Sequenza di escape per il colore predefinito
                 break;
             }
             if (edits > 0) // Salva le modifiche effettuate nel file temporaneo
@@ -265,7 +295,7 @@ void EditUser(Nodo *head, int numeroUtenti)
 }
 
 // Funzione che stampa il menu di amministrazione
-void Admin(Nodo* listaUtenti)
+void Admin(Nodo *listaUtenti)
 {
     int scelta, numero_utenti = CountUserNum();
 
@@ -274,24 +304,29 @@ void Admin(Nodo* listaUtenti)
         Sleep(1000);
         system("cls");
         printf("UniCode Bank | Console di amministrazione | %d Conti Bancari\n", numero_utenti);
-        printf("----------------------------------------------------------------\n");
+        Divisore();
         printf("Menu:\n\n");
         printf("1 - Gestisci un conto corrente\n\n");
-        printf("----------------------------------------------------------------\n");
+        Divisore();
         printf("0 - Esci\n");
-        printf("----------------------------------------------------------------\n");
+        Divisore();
 
         scelta = ReadInputChoice("Inserisci il numero corrispondente alla tua scelta: ", 0, 1);
 
-        switch (scelta) {
+        switch (scelta)
+        {
         case 1:
             EditUser(listaUtenti, numero_utenti);
             break;
         case 0:
+            printf("\033[0;34m"); // Sequenza di escape per il colore blu
             printf("Uscita dalla console di amministrazione in corso...\n");
+            printf("\033[0m"); // Sequenza di escape per il colore predefinito
             break;
         default:
+            printf("\033[0;31m"); // Sequenza di escape per il colore rosso
             printf("Scelta non valida.\n");
+            printf("\033[0m"); // Sequenza di escape per il colore predefinito
             break;
         }
     } while (scelta != 0);
