@@ -1,7 +1,61 @@
-#include "Main.h"
-
 #ifndef GENERAL_C // Include guard per evitare inclusioni multiple
 #define GENERAL_C
+
+#include "Main.h"
+
+/*
+    Primo parametro: char (colore)
+    Secondo parametro: stringa da colorare
+
+    La fuznione stampa la scritta di colore:    
+    - rosso: se il primo parametro e' 'r' (red);
+    - verde: se il primo parametro e' 'g' (green);
+    - blu: se il primo parametro e' 'b' (blue).
+*/
+void TintedPrint(char colore, const char *stringa) {
+    // Sequenze di escape ANSI per i colori
+    const char *coloreEscape = "";
+    switch (colore) {
+        case 'r':
+            coloreEscape = "\033[0;31m";  // Rosso
+            break;
+        case 'g':
+            coloreEscape = "\033[0;32m";  // Verde
+            break;
+        case 'b':
+            coloreEscape = "\033[0;34m";  // Blu
+            break;
+        default:
+            // Colore predefinito (bianco)
+            coloreEscape = "\033[0m";
+            break;
+    }
+
+    // Stampa la stringa con il colore specificato e reset del colore a bianco
+    printf("%s%s\033[0m", coloreEscape, stringa);
+}
+
+/*
+    Primo parametro: array di  (puntatore alla cella di indice 0)
+    Secondo carattere: char (carattere da controllare)
+
+    La funzione itera sull'array tramite un ciclo che confronta il carattere
+    della stringa puntato e il carattere specificato. Il ciclo si ferma quando
+    il carattere sara' uguale al terminatore di stringa "\0".
+
+    Return: false se il carattere non e' presente all'interno della stringa;
+    Return: true se il carattere e' presente all'interno della stringa.
+*/
+bool HasChar(const char *stringa, char carattere) {
+    while (*stringa != '\0') {
+        if (*stringa == carattere) {
+            return true;
+        }
+        stringa++;
+    }
+    return false;   
+}
+
 /*
     La funzione serve a pulire eventuali buffer rimasti in input da tastiera tramite
     getchar()
@@ -21,8 +75,8 @@ void pulisciBuffer()
     verificando che sia un intero compreso tra i valori specificati.
     La funzione e' ottimizzata per numeri naturali positivi.
 
-    Return: int input se il valore inserito e' corretto
-    Return: int -1 se il valore inserito non e' corretto
+    Return: int input se il valore inserito e' corretto;
+    Return: int -1 se il valore inserito non e' corretto.
 */
 int ReadInputChoice(const char *messaggio, int minimo, int massimo)
 {
@@ -36,7 +90,7 @@ int ReadInputChoice(const char *messaggio, int minimo, int massimo)
 
         if (fgets(buffer, sizeof(buffer), stdin) == NULL)
         {
-            printf("Errore nella lettura dell'input.\n");
+            TintedPrint('r', "\nErrore nella lettura dell'input.\n");
             exit(EXIT_FAILURE);
         }
 
@@ -44,18 +98,18 @@ int ReadInputChoice(const char *messaggio, int minimo, int massimo)
 
         if (conversione != 1 || buffer[0] == '\n')
         {
-            printf("Inserire un numero intero valido\n");
+            TintedPrint('r',"\nInserire un numero intero valido\n");
             return -1;
         }
         else if (input < minimo || input > massimo)
         {
             if (massimo != minimo)
-            {
-                printf("Inserire un numero compreso tra %d e %d\n", minimo, massimo);
+            {   
+                printf("\033[0;31m\nInserire un numero compreso tra %d e %d\033[0m\n", minimo, massimo);
             }
             else
             {
-                printf("Inserisci %d per continuare\n", minimo);
+                printf("\033[0;31m\nInserisci %d per continuare\033[0m\n", minimo);
             }
 
             return -1;
@@ -76,14 +130,18 @@ int ReadInputChoice(const char *messaggio, int minimo, int massimo)
 FILE *ApriFile(const char *nomeFile, const char *modalita, const char *messaggioErrore)
 {
     FILE *file = fopen(nomeFile, modalita); // Apertura file
-    if (!file)                              // Se il file non si è aperto, mostra un determinato messaggio di errore
+
+    if (!file) // Se il file non si e' aperto, mostra un determinato messaggio di errore
     {
         printf("\033[0;31m");    // Sequenza di escape per il colore rosso
         perror(messaggioErrore); // Stampiamo un messaggio prima del codice di errore stesso
         printf("\033[0m");       // Sequenza di escape per il colore predefinito
-        exit(EXIT_FAILURE);
+        return NULL;
     }
-    return file;
+    else // Se il file si e' aperto, allora ritorna il puntatore a file
+    {
+        return file;
+    }
 }
 
 /*
@@ -94,7 +152,7 @@ FILE *ApriFile(const char *nomeFile, const char *modalita, const char *messaggio
 */
 void ChiudiFile(FILE *file, const char *messaggioErrore)
 {
-    if (fclose(file) != 0) // Se il file non si è chiuso, mostra un determinato messaggio di errore
+    if (fclose(file) != 0) // Se il file non si e' chiuso, mostra un determinato messaggio di errore
     {
         printf("\033[0;31m");    // Sequenza di escape per il colore rosso
         perror(messaggioErrore); // Stampiamo un messaggio prima del codice di errore stesso
@@ -110,7 +168,7 @@ void ChiudiFile(FILE *file, const char *messaggioErrore)
 */
 void IsFileExists()
 {
-    FILE *file = ApriFile(FILE_NAME, "r", "CreateFail: errore nell'apertura del file"); // Apertura file tramite funzione 'ApriFile'
+    FILE *file = fopen(FILE_NAME, "r"); // Controllo se il file esiste
 
     if (file == NULL) // Se il file non esiste, crealo
     {
@@ -120,9 +178,13 @@ void IsFileExists()
         {
             fprintf(file, "NomeUtente;Password;IBAN;Saldo;Nome;Cognome;\n");
             fprintf(file, "admin_code;@UniCode2024;IT00A0000000000000000000000;0.00;Admin;Admin;\n");
+            ChiudiFile(file, "CreateFail: errore nella chiusura del file"); // Chiusura file tramite funzione 'ChiudiFile'
         }
     }
-    ChiudiFile(file, "CreateFail: errore nella chiusura del file"); // Chiusura file tramite funzione 'ChiudiFile'
+    else
+    {
+        ChiudiFile(file, "CreateFail: errore nella chiusura del file"); // Chiusura file tramite funzione 'ChiudiFile'
+    }
 }
 
 /*
@@ -131,8 +193,8 @@ void IsFileExists()
     La funzione apre il file principale in modalita "r" e cerca nella sua prima colonna il nome utente
     inserito come parametro.
 
-    Return: int 1 se il nome utente e' stato trovato
-    Return: int 0 se il nome utente non esiste nel file
+    Return: int 1 se il nome utente e' stato trovato;
+    Return: int 0 se il nome utente non esiste nel file.
 */
 int UserExists(const char *InputNomeUtente)
 {
@@ -380,17 +442,25 @@ int CountUserNum()
     return numero_utenti - 1; // Tolto l'utente amministratore
 }
 
+/*
+    Parametro: array di caratteri
+
+    La funzione modifica l'array in ingresso sostituendo le lettere maiuscole con quelle minuscole
+*/
 void ToLower(char Stringa[])
 {
-    for (int i = 0; Stringa[i]; i++) // Verifica se l'utentente inserisce un punto e virgola
+    for (int i = 0; Stringa[i]; i++)
     {
         Stringa[i] = tolower(Stringa[i]);
     }
 }
 
+/*
+    Funzione per stampare il divisore dell'interfaccia grafica
+*/
 void Divisore()
 {
-    int n = 85; // Numero di -
+    int n = 87; // Numero di "-"
     for (int i = 0; i <= n; i++)
     {
         printf("-");

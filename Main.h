@@ -8,7 +8,6 @@
 #include <time.h>
 #include <ctype.h>
 
-
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -21,7 +20,7 @@
 #define ABI "07648"               // Codice dell'Associazione Bancaria Italiana
 #define CAB "05433"               // Codice di Avviamento Bancario
 
-typedef struct utente// Struttura dati contenente le informazioni del singolo utente
+typedef struct utente // Struttura dati contenente le informazioni del singolo utente
 {
     char NomeUtente[MAX_STR_LEN];
     char Password[MAX_STR_LEN];
@@ -31,7 +30,7 @@ typedef struct utente// Struttura dati contenente le informazioni del singolo ut
     char Cognome[MAX_STR_LEN];
 } utente;
 
-typedef struct Nodo// Struttura dati contenente un nodo della lista utenti usata in amministrazione
+typedef struct Nodo // Struttura dati contenente un nodo della lista utenti usata in amministrazione
 {
     utente utente;
     struct Nodo* next;

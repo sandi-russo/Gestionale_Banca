@@ -1,21 +1,23 @@
+#ifndef BANK_C // Include guard per evitare inclusioni multiple
+#define BANK_C
+
 #include "Consumer.c"
 #include "Admin.c"
 
 void Login()
-{
+{   
+    IsFileExists();   // Richiamo la funzione per controllare se esiste il file CSV
+
     FILE *file = ApriFile(FILE_NAME, "r", "LoginFail: errore nell'apertura del file."); // Apertura file tramite funzione 'ApriFile'
 
     char InputNomeUtente[MAX_STR_LEN], InputPassword[MAX_STR_LEN], RigaUtente[MAX_STR_LEN];
     int Trovato, tentativi = 5, daticorretti = 0;
-
     while (!daticorretti && tentativi > 0) // Ciclo visualizzazione menu di autenticazione
     {
-        printf("\033[0;34m"); // Sequenza di escape per il colore blu
-        printf("\nCaricamento in corso...\n");
-        printf("\033[0m"); // Sequenza di escape per il colore predefinito
-        Sleep(1000);       // Pausa
+        TintedPrint('b',"\nCaricamento in corso...");
+        Sleep(1500);       // Pausa
         system("cls");
-        printf("Accedi con le tue credenziali | Tentativi rimasti: %d\n", tentativi);
+        printf("Accedi con le tue credenziali | Tentativi rimasti: \033[0;32m%d\033[0m\n", tentativi);
         Divisore();
         printf("Inserisci il tuo nome utente: ");
         scanf("%s", InputNomeUtente);
@@ -27,9 +29,7 @@ void Login()
 
         if (SearchInFile("NomeUtente", InputNomeUtente, RigaUtente) > 0) // Cerca la riga contenente il valore specificato nella colonna specificata
         {
-            printf("\033[0;31m");                   // Sequenza di escape per il colore rosso
-            printf("Username errato.\nRiprova.\n"); // Username non esistente nel file
-            printf("\033[0m");                      // Sequenza di escape per il colore predefinito
+            TintedPrint('r', "\nNome utente inesistente. Riprova: ");
             tentativi--;
         }
         else
@@ -42,9 +42,7 @@ void Login()
                 ChiudiFile(file, "LoginFail: il file non e' stato chiuso correttamente."); // Chiusura file tramite funzione 'ChiudiFile'
                 if (strcmp("admin_code", user.NomeUtente) == 0)
                 {
-                    printf("\033[0;32m"); // Sequenza di escape per il colore verde
-                    printf("\nAmministratore autenticato con successo.\n\nIngresso nella console...\n");
-                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
+                    TintedPrint('g', "\nAmministratore autenticato con successo. Ingresso nella console...\n");
                     Nodo *listaUtenti = ListFromCSV();
                     Admin(listaUtenti);
                     FreeUserList(listaUtenti);
@@ -52,16 +50,14 @@ void Login()
                 else
                 {
                     printf("\033[0;32m"); // Sequenza di escape per il colore verde
-                    printf("\nUtente [%s] autenticato con successo\n\nIngresso nel conto...\n", user.NomeUtente);
+                    printf("\nUtente [%s] autenticato con successo. Ingresso nel conto...\n", user.NomeUtente);
                     printf("\033[0m"); // Sequenza di escape per il colore predefinito
                     Consumer(user);
                 }
             }
             else
             {
-                printf("\033[0;31m"); // Sequenza di escape per il colore rosso
-                printf("\nPassword errata.\nRiprova.\n");
-                printf("\033[0m"); // Sequenza di escape per il colore predefinito
+                TintedPrint('r', "\nPassword errata. Riprova: \n");
                 tentativi--;
             }
         }
@@ -70,9 +66,7 @@ void Login()
         {
             if (tentativi == 0)
             {
-                printf("\033[0;31m");                                                      // Sequenza di escape per il colore rosso
-                printf("\nTroppi tentativi errati.\n\nUscita in corso...\n");              // Stampa avviso di numero di tentativi disponibili superato
-                printf("\033[0m");                                                         // Sequenza di escape per il colore predefinito
+                TintedPrint('r', "\nTroppi tentativi errati. Uscita in corso...\n");
                 ChiudiFile(file, "LoginFail: il file non e' stato chiuso correttemente."); // Chiusura file tramite funzione 'ChiudiFile'
             }
         }
@@ -83,23 +77,23 @@ void Banca()
 {
     int scelta;
 
-    Sleep(1000); // Pausa
+    Sleep(1500); // Pausa
     system("cls");
     do // Ciclo visualizzazione menu banca
     {
-        printf("UniCode Bank | Benvenuto!\n");
+        printf("\033[0;34mUniCode\033[0m \033[0;32mBank\033[0m | Pagina iniziale\n");
         Divisore();
         printf("Menu:\n\n");
         printf("1 - Entrare nel conto\n");
         printf("2 - Aprire un conto\n\n");
         Divisore();
-        printf("0 - Esci dal programma\n");
+        TintedPrint('r', "0 - Esci dal programma\n");
         Divisore();
 
         scelta = ReadInputChoice("Inserisci il numero corrispondente alla tua scelta: ", 0, 2);
         if (scelta == -1)
         {
-            Sleep(1000);
+            Sleep(1500);
             system("cls");
             continue;
         }
@@ -114,17 +108,12 @@ void Banca()
         }
         else if (scelta == 0)
         {
-            printf("\033[0;34m"); // Sequenza di escape per il colore blu
-            printf("\nUscita dal programma in corso...\n");
-            printf("\033[0m"); // Sequenza di escape per il colore predefinito
+            TintedPrint('b', "\nUscita dal programma in corso...\n");
         }
-        else
-        {
-            printf("\033[0;31m");                                                 // Sequenza di escape per il colore rosso
-            printf("\nIl valore inserito non e' valido.\nPer favore riprova.\n"); // Gestisci input non validi
-            printf("\033[0m");                                                    // Sequenza di escape per il colore predefinito
-        }
-        Sleep(1000); // Pausa
+
+        Sleep(1500); // Pausa
         system("cls");
     } while (scelta != 0); // Fino a quando la scelta è diversa da 0, ripete il ciclo
 }
+
+#endif // BANK_C
