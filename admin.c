@@ -1,4 +1,4 @@
-#include "general.c"
+#include "General.c"
 
 // Funzione per scrivere la lista dinamica in un file csv temporaneo
 int SaveListToCSV(const char *FileName, Nodo *head)

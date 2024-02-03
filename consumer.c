@@ -1,4 +1,4 @@
-#include "general.c"
+#include "General.c"
 
 /*
     Parametro: array di caratteri vuoto

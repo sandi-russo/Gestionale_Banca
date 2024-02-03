@@ -1,4 +1,4 @@
-#include "main.h"
+#include "Main.h"
 
 #ifndef GENERAL_C // Include guard per evitare inclusioni multiple
 #define GENERAL_C

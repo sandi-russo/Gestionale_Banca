@@ -1,5 +1,5 @@
-#include "admin.c"
-#include "consumer.c"
+#include "Consumer.c"
+#include "Admin.c"
 
 void Login()
 {
