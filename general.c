@@ -468,4 +468,51 @@ void Divisore()
     printf("\n");
 }
 
+/*
+    Parametro: array di caratteri (password)
+
+    La funzione analizza la stringa controllando la presenza dei requisiti minimi
+    di una password sicura per l'apertura e l'accesso al conto.
+*/
+bool VerificaPassword(const char *password)
+{
+    // Verifica la lunghezza minima
+    if (strlen(password) < 5)
+    {
+        return false;
+    }
+
+    // Verifica la presenza di almeno una maiuscola, una minuscola, un carrattere speciale e un numero
+    bool maiuscola = false;
+    bool minuscola = false;
+    bool numero = false;
+    bool speciale = false;
+    for (int i = 0; password[i] != '\0'; i++)
+    {
+        if (isupper(password[i])) // Almeno un carattere maiuscolo
+        {
+            maiuscola = true;
+        }
+        else if (islower(password[i])) // Almeno un carattere minuscolo
+        {
+            minuscola = true;
+        }
+        else if (isdigit(password[i])) // Almeno un carattere numerico
+        {
+            numero = true;
+        }
+        else if (!isalnum(password[i])) // Almeno un carattere non alfanumerico (speciale)
+        {
+            speciale = true;
+        }
+    }
+
+    if (!maiuscola || !minuscola || !numero || !speciale)
+    {
+        return false;
+    }
+
+    return true; // Se tutti i criteri sono soddisfatti
+}
+
 #endif // GENERAL_C
