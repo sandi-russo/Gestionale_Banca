@@ -9,8 +9,7 @@
 void pulisciBuffer()
 {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
 /*
@@ -149,9 +148,6 @@ int UserExists(const char *InputNomeUtente)
 
         if (strcmp(InputNomeUtente, StoredNomeUtente) == 0)
         {
-            printf("\033[0;31m"); // Sequenza di escape per il colore rosso
-            printf("\nUtente [%s] gia' registrato. Riprova\n", InputNomeUtente);
-            printf("\033[0m");                                            // Sequenza di escape per il colore predefinito
             ChiudiFile(file, "UserFail: errore nella chiusura del file"); // Chiusura file tramite funzione 'ChiudiFile'
             return 1;                                                     // Indica che il nome utente esiste nel file
         }
@@ -394,7 +390,7 @@ void ToLower(char Stringa[])
 
 void Divisore()
 {
-    int n = 80; // Numero di -
+    int n = 85; // Numero di -
     for (int i = 0; i <= n; i++)
     {
         printf("-");

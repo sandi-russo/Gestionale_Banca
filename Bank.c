@@ -87,7 +87,7 @@ void Banca()
     system("cls");
     do // Ciclo visualizzazione menu banca
     {
-        printf("UniCode Bank: Benvenuto!\n");
+        printf("UniCode Bank | Benvenuto!\n");
         Divisore();
         printf("Menu:\n\n");
         printf("1 - Entrare nel conto\n");

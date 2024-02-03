@@ -99,8 +99,10 @@ void EliminaConto(utente *user)
             system("cls");
             printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user->Nome, user->Cognome, user->Saldo);
             Divisore();
+            printf("\033[0;31m"); // Sequenza di escape per il colore rosso
             printf("Continuando accetterai di chiudere il conto, eliminando le tue credenziali d'accesso.\n");
             printf("Potrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale.\n");
+            printf("\033[0m"); // Sequenza di escape per il colore predefinito
             Divisore();
             printf("IBAN destinatario confermato: %s\n", IBAN);
         } while (corretta != 0 || corrispondono != 0);
@@ -297,8 +299,10 @@ void Consumer(utente user)
                 system("cls");
                 printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
                 Divisore();
+                printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                 printf("Continuando accetterai di chiudere il conto, eliminando le tue credenziali d'accesso.\n");
                 printf("Potrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale.\n");
+                printf("\033[0m"); // Sequenza di escape per il colore predefinito
                 Divisore();
                 printf("\n1 - Continua e chiudi il conto\n\n");
                 Divisore();
@@ -317,9 +321,11 @@ void Consumer(utente user)
                     system("cls");
                     printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user.Nome, user.Cognome, user.Saldo);
                     Divisore();
+                    printf("\033[0;31m"); // Sequenza di escape per il colore rosso
                     printf("Continuando accetterai di chiudere il conto, eliminando le tue credenziali d'accesso.\n");
                     printf("Potrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale.\n");
-                    printf("----------------------------------------------------------------");
+                    printf("\033[0m"); // Sequenza di escape per il colore predefinito
+                    Divisore();
                     EliminaConto(&user);
                     printf("\033[0;34m"); // Sequenza di escape per il colore blu
                     printf("\nConto eliminato con successo.\nReindirizzamento al menu in corso...");
@@ -360,7 +366,8 @@ void Register()
         Sleep(1000);       // Pausa
         system("cls");
 
-        printf("Compila il seguente form per aprire il conto:\n");
+        printf("UniCode Bank | Compila il seguente form per aprire il conto:\n");
+        Divisore();
 
         printf("Inserisci il tuo nome: ");
         // scanf("%s", Nome);
@@ -371,8 +378,28 @@ void Register()
         fgets(Cognome, MAX_STR_LEN, stdin);
         Cognome[strcspn(Cognome, "\n")] = '\0'; // Rimuove il carattere newline dalla fine della stringa
 
-        printf("Inserisci un nome utente: ");
-        scanf("%s", NomeUtente);
+        do
+        {
+            system("cls");
+
+            printf("UniCode Bank | Compila il seguente form per aprire il conto:\n");
+            Divisore();
+            printf("Inserisci il tuo nome: %s\n", Nome);
+            printf("Inserisci il tuo cognome: %s\n", Cognome);
+            printf("Inserisci un nome utente: ");
+            scanf("%s", NomeUtente);
+            ToLower(NomeUtente);
+
+            if (UserExists(NomeUtente) != 0)
+            {
+                printf("\033[0;31m"); // Sequenza di escape per il colore rosso
+                printf("Il nome utente [%s] e' gia' esistente.\n", NomeUtente);
+                printf("\033[0m"); // Sequenza di escape per il colore predefinito
+                Sleep(1000);
+            }
+
+        } while (UserExists(NomeUtente) != 0);
+
         printf("Inserisci una password: ");
         scanf("%s", Password);
         pulisciBuffer();
@@ -385,6 +412,7 @@ void Register()
         Delimiter = 0; // Inizializzo il flag Delimiter a falso
 
         ToLower(NomeUtente);
+
         for (int i = 0; NomeUtente[i]; i++) // Verifica se l'utentente inserisce un punto e virgola
         {
             if (NomeUtente[i] == ';' || Nome[i] == ';' || Cognome[i] == ';' || Password[i] == ';' || ConfermaPassword[i] == ';')
@@ -410,7 +438,7 @@ void Register()
         {
             FineRegistrazione = 1;
         }
-    } while (Delimiter || UserExists(NomeUtente) != 0 || FineRegistrazione != 1);
+    } while (Delimiter || FineRegistrazione != 1);
 
     Writing(FILE_NAME, NomeUtente, Password, IBAN, Saldo, Nome, Cognome);
     printf("\033[0;32m"); // Sequenza di escape per il colore verde
