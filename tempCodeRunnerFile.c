@@ -1,1 +1,0 @@
-TintedPrint('b',"\nCaricamento in corso...");

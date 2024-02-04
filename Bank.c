@@ -1,8 +1,8 @@
 #ifndef BANK_C // Include guard per evitare inclusioni multiple
 #define BANK_C
 
-#include "Consumer.c"
-#include "Admin.c"
+#include "consumer.c"
+#include "admin.c"
 
 void Login()
 {   

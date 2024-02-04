@@ -1,7 +1,7 @@
 #ifndef ADMIN_C
 #define ADMIN_C
 
-#include "General.c"
+#include "general.c"
 
 /*
     Primo parametro: array di caratteri (nome del file)

@@ -24,15 +24,21 @@ In aggiunta, un obiettivo centrale del progetto è stato promuovere la cooperazi
 
 Il codice sorgente è organizzato in modo chiaro e modulare:
  
-- Il file "bank.h" funge da header, contenente tutte le strutture di dati, le librerie e le costanti neccessarie per il corretto funzionamento del programma;
+- Il file "Main.h" funge da header, contenente tutte le strutture di dati, le librerie e le costanti neccessarie per il corretto funzionamento del programma;
 
-- Il file "bank.c" contiene la definizione delle varie funzioni e la loro implementazione nella simulazione bancaria;
+- Il file "general.c" contiene la definizione delle funzioni a scopo generale che sono utili durante tutta l'esecuzione del programma, ad esempio la parte relativa alla gestione file;
+
+- Il file "consumer.c" contiene la definizione delle funzioni relative al campo dell'utente consumer;
+
+- Il file "admin.c" contiene la definizione delle funzioni relative alla gestione dei conti bancari da parte dell'amministrazione;
+
+- Il file "bank.c" contiene la fase di autenticazione e l'implementazione finale delle funzioni nella simulazione bancaria;
 
 - Il file "main.c" contiene l'esecuzione finale del programma, garantendo una struttura ordinata e comprensibile;
 
 - Il file "utenti.csv" funge da dispositivo di archiviazione permanente, memorizzando in una riga le informazioni riguardanti un singolo utente, organizzate per campi adeguatamente separati, facilitandone la lettura ed aumentando l'efficienza generale del programma;
 
--il file "temp.c", visibile solo durante l'esecuzione di specifici comandi, consente di gestire in modo sicuro e funzionale le modifiche all'archiviazione permanente primaria contenuta "in utenti.csv".
+- il file "temp.c", visibile solo durante l'esecuzione di specifici comandi, consente di gestire in modo sicuro e funzionale le modifiche all'archiviazione permanente primaria contenuta "in utenti.csv".
 
 ## Istruzioni per l'Esecuzione
 
@@ -44,7 +50,7 @@ Dopo la compilazione, esegui il programma e segui le istruzioni visualizzate a s
 
 Nel processo di sviluppo del codice, come precedentemente menzionato, sono state progressivamente integrate le competenze acquisite durante il corso di Programmazione, tenuto dal Professore Francesco Maiorana presso l'Università degli Studi di Messina. L'obiettivo principale era applicare e consolidare il più ampio spettro possibile di nozioni, arricchendole attraverso approfondimenti e studio individuale, al fine di conferire al sistema di gestione bancaria un livello di praticità e funzionalità elevato.
 
-Il codice sfrutta diverse competenze avanzate, tra cui l'uso di puntatori, gestione dei file, implementazione di strutture dati complesse, definizione di funzioni modulari, manipolazione di vari tipi di dati e conversioni, gestione di vettori e manipolazione di stringhe, nonché l'allocazione dinamica di memoria.
+Il codice sfrutta diverse competenze avanzate, tra cui l'uso di puntatori, gestione dei file, implementazione di strutture dati complesse, definizione di funzioni modulari, manipolazione di vari tipi di dati e conversioni, gestione di vettori e manipolazione di stringhe, l'allocazione dinamica di memoria nonché l'implementazione delle liste.
 
 ## Stato Attuale del Progetto e Prospettive Future
 

@@ -1,7 +1,7 @@
 #ifndef CONSUMER_C
 #define CONSUMER_C
 
-#include "General.c"
+#include "general.c"
 
 /*
     Parametro: array di caratteri vuoto
@@ -351,7 +351,7 @@ void Register()
     IsFileExists();   // Richiamo la funzione per controllare se esiste il file CSV
     GeneraIBAN(IBAN); // Richiamo la funzione per generare un IBAN
     float Saldo = 0.00;
-    int HasDelimiter = 0;
+    int HasDelimiter;
     char delimitatore = ';';
 
     do // Ciclo visualizzazione menu registrazione

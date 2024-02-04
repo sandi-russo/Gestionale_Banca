@@ -1,7 +1,7 @@
 #ifndef GENERAL_C // Include guard per evitare inclusioni multiple
 #define GENERAL_C
 
-#include "Main.h"
+#include "main.h"
 
 /*
     Primo parametro: char (colore)
