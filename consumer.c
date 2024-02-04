@@ -83,7 +83,7 @@ int EliminaConto(utente *user)
 
         if (user->Saldo > 0 && numeroConti > 1) // Se l'utente ha saldo disponibile e c'e' un conto su cui trasferirlo
         {   
-            TintedPrint('r', "Dovrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale.");
+            TintedPrint('r', "Dovrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale.\n");
             Divisore();
             printf("\nInserisci l'IBAN destinatario: ");
             scanf("%s", IBAN);
@@ -98,7 +98,7 @@ int EliminaConto(utente *user)
                     printf("Titolare del conto: %s %s | Saldo Corrente: %0.2f\n", user->Nome, user->Cognome, user->Saldo);
                     Divisore();
                     TintedPrint('r', "CONTINUANDO ACCETTERAI DI CHIUDERE IL TUO CONTO ELIMINANDO LE TUE CREDENZIALI D'ACCESSO!\n");
-                    TintedPrint('r', "Dovrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale.");
+                    TintedPrint('r', "Dovrai specificare l'IBAN del conto su cui vuoi trasferire il tuo saldo attuale.\n");
                     Divisore();
                     printf("\033[0;32m"); // Sequenza di escape per il colore verde
                     printf("\nIBAN destinatario confermato: %s\n", IBAN);
